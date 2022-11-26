@@ -1,0 +1,144 @@
+openapi: 3.0.0
+info: 
+  title: college-center-apis
+  description: These apis are for my college-center application.
+  version: 1.0.0
+servers: 
+  - url: http://localhost:4500/api/v1
+paths:
+  /userExist:
+   get:
+    tags: ["auth"]
+    description: Check if a user with the email already exist or not
+    parameters:
+     - name: email
+       in: query
+       description: The parameter is the email the user is trying to use for registration & username
+       required: true
+       schema:
+        type: string
+    responses:
+     "200":
+      description: The GET operation on /userExist was successful.
+      content:
+       application/json:
+        schema:
+         type: object
+         properties:
+          userEmail:
+           type: string
+          userExist:
+           type: boolean
+  /register:
+    post:
+      tags: ["auth"]
+      description: Path for user registration
+      requestBody:
+        description: Need to provide registration infos
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                role: 
+                  type: string
+      responses:
+        "200":
+          description: The registration was successfull.
+          content:
+            application/json:
+             schema:
+              type: object
+              properties:
+               message:
+                type: string
+  /login:
+   post:
+    tags: ["auth"]
+    description: Get user credential
+    requestBody:
+     description: The body need to contain the user email and password
+     required: true
+     content:
+      application/json:
+       schema:
+        type: object
+        properties:
+         email:
+          type: string
+         password:
+          type: string
+    responses:
+     "200":
+      description: The response will contain the user's email and password
+      content:
+       application/json:
+        schema:
+         type: object
+         properties:
+          credentials:
+           type: object
+           properties:
+            AccessKeyId: 
+             type: string
+            Expiration:
+             type: string
+            SecretKey:
+             type: string
+            SessionToken:
+             type: string
+          user:
+           type: object
+           properties:
+            aws_confirmed:
+             type: boolean
+            email:
+             type: string
+            enrolled:
+             type: boolean
+            id: 
+             type: string
+            role:
+             type: string
+  /confirm:
+   put:
+    tags: ["auth"]
+    description: Confirm the AWS account and update the user record to confirmed
+    requestBody:
+     required: true
+     content:
+      application/json:
+       schema:
+        type: object
+        properties:
+         userEmail:
+          type: string
+         confirmationCode:
+          type: string
+    responses:
+     "200":
+      description: Will return a boolean indicating successfully confirming account.
+      content:
+       application/json:
+        schema:
+         type: object
+         properties:
+          accountConfirmed: 
+           type: boolean
+        
+    
+    
+    
+      
+    
+               
+             
+
+

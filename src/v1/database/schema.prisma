@@ -1,0 +1,90 @@
+datasource db {
+  url      = "mysql://doadmin:AVNS_wQS4wZItAjhx_K76EC9@docusign-db-do-user-11811276-0.b.db.ondigitalocean.com:25060/university-center-db?ssl-mode=REQUIRED"
+  provider = "mysql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String @id
+  name      String
+  email     String @unique   
+  role      Role  
+  aws_confirmed   Boolean  @default(false)
+  enrolled  EnrollmentStatus @default(PENDING)
+
+  admin Admin[]
+  professor Professor[]
+  student Student[]
+
+  }
+
+model Student {
+  id  String @id
+
+  user User @relation(fields:[userId], references: [id])
+  userId     String  
+
+  courses Course @relation(fields: [courseId], references: [id])
+  courseId String
+
+  grade Grade[]
+
+  @@unique([courseId, userId])
+}
+
+model Professor {
+  id String @id
+
+  user User @relation(fields: [userId], references: [id])
+  userId String
+
+  course Course @relation(fields: [courseId], references: [id])
+
+  courseId String 
+
+  @@unique([courseId, userId])
+
+
+}
+
+model Admin {
+  id String @id
+
+  user User @relation(fields: [userId], references: [id])
+  userId String 
+}
+
+model Course {
+
+  id    String  @id
+  name  String @unique
+  description String 
+
+
+  student Student[]
+  professor Professor[]
+
+}
+
+model Grade {
+  id  String @id
+  grade Int
+
+  student Student @relation(fields: [studentId], references: [id])
+  studentId String
+}
+
+enum Role {
+  ADMIN
+  PROFESSOR
+  STUDENT
+}
+
+enum EnrollmentStatus {
+  ACCEPTED
+  REJECTED
+  PENDING
+}
