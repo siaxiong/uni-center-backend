@@ -11,12 +11,12 @@ import { NextFunction } from "express";
 import { AWS_Types } from "../../../../myTypes";
 
 const ACCOUNT_ID = process.env.AWS_ACCOUNT_ID;
-const IDENTITY_POOL_ID = process.env.AWS_IDENTITY_POOL_ID;
-const USER_POOL_APP_CLIENT_ID = process.env.AWS_USER_POOL_APP_CLIENT_ID;
-const USER_POOL_ARN = process.env.AWS_USER_POOL_ARN;
+const IDENTITY_POOL_ID = process.env.UC_AWS_IDENTITY_POOL_ID;
+const USER_POOL_APP_CLIENT_ID = process.env.UC_AWS_USER_POOL_APP_CLIENT_ID;
+const USER_POOL_ARN = process.env.UC_AWS_USER_POOL_ARN;
 
 const REGION = process.env.AWS_REGION;
-const USER_POOL_ID = process.env.AWS_USER_POOL_ID;
+const USER_POOL_ID = process.env.UC_AWS_USER_POOL_ID;
 
 /* getCredential() (which is just logging in) big idea
 1. Get a user ID from the Cognito User pool
@@ -27,6 +27,9 @@ const USER_POOL_ID = process.env.AWS_USER_POOL_ID;
 
 const getCredential = async (email : string, password : string) => {
         //Just building the cmd to get the user ID
+
+        console.log(USER_POOL_APP_CLIENT_ID);
+        console.log("hello 2022");
         const authCMD = new InitiateAuthCommand({
             ClientId: USER_POOL_APP_CLIENT_ID,
             AuthParameters: {

@@ -9,8 +9,12 @@ const register = async function({email,password,name,role}: Auth_Types.RegisterD
     return db_resp;
 }
 
-const login = async function({email,password}: Auth_Types.LoginData){
+const login = async function({email,password}:{email:string, password:string}){
     // const aws_credential = await AWS.getCredential(email, password);
+
+    console.log("AWS Login");
+
+
     const credential = await AWS.getCredential(email, password);
     console.log("🚀 ~ file: authService.ts ~ line 15 ~ login ~ credential", credential)
     const db_record = await UserService.getUserRecord(email);

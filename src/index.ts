@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
-dotenv.config();
+dotenv.config({path: "../.env"});
+console.log(process.env);
 import { json, NextFunction, Request, RequestHandler, Response } from "express";
 import express from "express";
 import cors from "cors";
@@ -13,6 +14,7 @@ const userArr = [
 
 ];
 
+console.log(__dirname);
 
 const app = express();
 const PORT = 3500;
