@@ -27,6 +27,5 @@ jobs:
     - run: npm i
     #Setup ORm
     - run: npm run prismaMigrateDev
-    - run: npm run start
 
     
