@@ -38,6 +38,7 @@ const getCredential = async (email : string, password : string) => {
     
         //Using the built cmd above to get the user ID from the user pool
         const user_pool_result = await userPoolClient.send(authCMD);
+        console.log("🚀 ~ file: cognitoFunctions.ts ~ line 41 ~ getCredential ~ user_pool_result", user_pool_result)
     
         //Just building the cmd to get the identity ID
         const getIdCMD = new GetIdCommand({
@@ -50,6 +51,7 @@ const getCredential = async (email : string, password : string) => {
         
         //Using the built identity cmd above to get the identity ID from the identity pool
         const identity_pool_result = await identityPoolClient.send(getIdCMD);
+        console.log("🚀 ~ file: cognitoFunctions.ts ~ line 54 ~ getCredential ~ identity_pool_result", identity_pool_result)
     
         const credential = await identityPoolClient.send(new GetCredentialsForIdentityCommand({
             IdentityId: identity_pool_result.IdentityId,
@@ -57,6 +59,7 @@ const getCredential = async (email : string, password : string) => {
                 [USER_POOL_ARN as string]: user_pool_result.AuthenticationResult.IdToken,
             },
         }));
+        console.log("🚀 ~ file: cognitoFunctions.ts ~ line 62 ~ getCredential ~ credential", credential)
 
         return credential.Credentials;
 };
@@ -126,6 +129,7 @@ const assignUserToGroup = async function(cred: Credentials,email: string, role: 
         UserPoolId: USER_POOL_ID,
         Username: email
     })
+    console.log("🚀 ~ file: cognitoFunctions.ts ~ line 132 ~ assignUserToGroup ~ addUserToGroup", addUserToGroup)
 
     // await developerClient.send(addUserToGroup);
 }

@@ -14,6 +14,7 @@ const register = catchError(
 const login = catchError(
     async function(req: Request, resp: Response){
         const {email, password} = req.body;
+        console.log("🚀 ~ file: authController.ts ~ line 17 ~ function ~ req.body", req.body)
 
         const data = await AuthService.login({email,password});
         resp.json(data);
