@@ -15,7 +15,7 @@ const userArr = [
 
 
 const app = express();
-const PORT = 4500;
+const PORT = 3500;
 
 app.use(express.json());
 app.use(cors());
