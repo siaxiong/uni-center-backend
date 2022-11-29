@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --poll src/index.ts && npm run prisma",
-    "build": "rimraf ./build && tsc",
+    "build": "rimraf ./build && npx prisma generate --schema=./src/v1/database/schema.prisma && tsc",
     "start": "npm run build && node build/index.js",
     "prisma": "cd src/v1/database && npx prisma init",
     "prismaMigrateDev": "npx prisma migrate dev --schema=./src/v1/database/schema.prisma --name my-first-migrate",

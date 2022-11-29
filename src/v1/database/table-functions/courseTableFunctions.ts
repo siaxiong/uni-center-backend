@@ -1,6 +1,5 @@
 import prismaClient from "../prismaClient";
 import { createUniqueID } from "../uniqueID";
-import {Prisma} from "@prisma/client";
 
 
 type CourseRecord = {

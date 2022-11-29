@@ -1,5 +1,4 @@
 import express, {Response, Request, NextFunction} from "express";
-import { Prisma, User } from "@prisma/client";
 import { catchError } from "../../utils/catchError";
 import { UserService, ProfessorService, CourseService } from "../../services/services";
 
