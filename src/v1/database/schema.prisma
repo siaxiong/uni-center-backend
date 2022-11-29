@@ -1,5 +1,5 @@
 datasource db {
-  url      = "mysql://doadmin:AVNS_wQS4wZItAjhx_K76EC9@docusign-db-do-user-11811276-0.b.db.ondigitalocean.com:25060/university-center-db?ssl-mode=REQUIRED"
+  url      = "mysql://user1:password@128.199.10.78:3306/uc-db"
   provider = "mysql"
 }
 

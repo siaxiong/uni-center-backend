@@ -8,8 +8,7 @@ type AsyncFunction = (arg:Promise<any>)=>void;
 // scenerio would pass the test below)
 const checkEmptyValue = async function(arg: Promise<any>){
    const result = await arg;
-   console.log("🚀 ~ file: checkEmptyValue.ts ~ line 6 ~ checkEmptyValue ~ result", result)
-   
+   console.log(result);
    if(result === "" ||
    result === null ||
    result === undefined ||

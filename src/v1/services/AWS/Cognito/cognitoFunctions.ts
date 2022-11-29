@@ -5,13 +5,13 @@ import {InitiateAuthCommand, SignUpCommand, ConfirmSignUpCommand,
 import {GetCredentialsForIdentityCommand,GetOpenIdTokenForDeveloperIdentityCommand, GetIdCommand, Credentials} from "@aws-sdk/client-cognito-identity";
 import {AssumeRoleWithWebIdentityCommand } from "@aws-sdk/client-sts"; 
 const {CognitoIdentityClient} = require("@aws-sdk/client-cognito-identity");
-
 import {userPoolClient, identityPoolClient} from "./cognitoClients";
 import { NextFunction } from "express";
 import { AWS_Types } from "../../../../myTypes";
 
 const ACCOUNT_ID = process.env.AWS_ACCOUNT_ID;
 const IDENTITY_POOL_ID = process.env.UC_AWS_IDENTITY_POOL_ID;
+
 const USER_POOL_APP_CLIENT_ID = process.env.UC_AWS_USER_POOL_APP_CLIENT_ID;
 const USER_POOL_ARN = process.env.UC_AWS_USER_POOL_ARN;
 
@@ -27,9 +27,6 @@ const USER_POOL_ID = process.env.UC_AWS_USER_POOL_ID;
 
 const getCredential = async (email : string, password : string) => {
         //Just building the cmd to get the user ID
-
-        console.log(USER_POOL_APP_CLIENT_ID);
-        console.log("hello 2022");
         const authCMD = new InitiateAuthCommand({
             ClientId: USER_POOL_APP_CLIENT_ID,
             AuthParameters: {
@@ -41,7 +38,6 @@ const getCredential = async (email : string, password : string) => {
     
         //Using the built cmd above to get the user ID from the user pool
         const user_pool_result = await userPoolClient.send(authCMD);
-        console.log("🚀 ~ file: cognitoFunctions.ts ~ line 41 ~ getCredential ~ user_pool_result", user_pool_result)
     
         //Just building the cmd to get the identity ID
         const getIdCMD = new GetIdCommand({
@@ -54,7 +50,6 @@ const getCredential = async (email : string, password : string) => {
         
         //Using the built identity cmd above to get the identity ID from the identity pool
         const identity_pool_result = await identityPoolClient.send(getIdCMD);
-        console.log("🚀 ~ file: cognitoFunctions.ts ~ line 54 ~ getCredential ~ identity_pool_result", identity_pool_result)
     
         const credential = await identityPoolClient.send(new GetCredentialsForIdentityCommand({
             IdentityId: identity_pool_result.IdentityId,
@@ -62,7 +57,6 @@ const getCredential = async (email : string, password : string) => {
                 [USER_POOL_ARN as string]: user_pool_result.AuthenticationResult.IdToken,
             },
         }));
-        console.log("🚀 ~ file: cognitoFunctions.ts ~ line 62 ~ getCredential ~ credential", credential)
 
         return credential.Credentials;
 };
@@ -77,6 +71,7 @@ const createAWSAccount = async (email : string, password : string, fullName : st
         "Value": email,
     }];
 
+    console.log(USER_POOL_APP_CLIENT_ID);
     const signUpCMD = new SignUpCommand({
         "ClientId": USER_POOL_APP_CLIENT_ID,
         "Username": email,
@@ -132,8 +127,6 @@ const assignUserToGroup = async function(cred: Credentials,email: string, role: 
         UserPoolId: USER_POOL_ID,
         Username: email
     })
-    console.log("🚀 ~ file: cognitoFunctions.ts ~ line 132 ~ assignUserToGroup ~ addUserToGroup", addUserToGroup)
-
     // await developerClient.send(addUserToGroup);
 }
 

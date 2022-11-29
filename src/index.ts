@@ -1,20 +1,12 @@
 import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
-dotenv.config({path: "../.env"});
+dotenv.config({override: true});
 console.log(process.env);
+
 import { json, NextFunction, Request, RequestHandler, Response } from "express";
 import express from "express";
 import cors from "cors";
 import {AuthRouter, CourseRouter, UserRouter, ProfessorRouter} from "./v1/routes/routers";
 
-const userArr = [
-    {email:"siaxiong1@gmail.com",password: "123password", name:"prof1", role:"PROFESSOR"},
-    {email:"siaxiong2@gmail.com", password: "123password", name: "prof2", role:"PROFESSOR"},
-    {email:"siaxiong3@gmail.com", password: "123password", name: "prof3", role:"PROFESSOR"},
-    {email:"siaxiong4@gmail.com", password: "123password", name: "prof4", role:"PROFESSOR"},
-
-];
-
-console.log(__dirname);
 
 const app = express();
 const PORT = 3500;

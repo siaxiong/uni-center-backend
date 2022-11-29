@@ -16,13 +16,5 @@ const catchError = (fn: ExpressFunction)=>(req:Request,res:Response,next:NextFun
 
 })
 
-// const catchError = async (fn: ExpressFunction)=>{
-//     try {
-//      await fn;
-        
-//     } catch (error) {
-//         console.log(fn);
-//     }
-// }
 
 export {catchError}
