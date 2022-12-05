@@ -1,63 +1,39 @@
+import { Prisma } from "@prisma/client";
 import prismaClient from "../prismaClient";
-import {createUniqueID} from "../uniqueID"
+import {PrismaTypes} from "../../../myTypes";
 
 
-type ProfessorRecord = {
-    userId?: string
-    courseId?: string
-}
+const getProfessors = async function(){
+	console.log("*********getProfessors()**********");
+	return prismaClient.professor.findMany({});
+};
 
-const getAllProfessors = async function(){
-    return prismaClient.Professor.findMany();
-}
-
-const getUniqueProfessor = async function(id:string){
-    return prismaClient.Professor.findUnique({
-        where: {
-            id
-        }
-    })
-}
-
-const getFilteredProfessors = async function(payload: ProfessorRecord){
-    return prismaClient.Professor.findMany({
-        where: payload
-    })
-}
+const getFilteredProfessors = async function(payload: PrismaTypes.ProfessorAttributes){
+	return prismaClient.professor.findMany({
+		where: payload
+	});
+};
 
 const getDistinctCourses = async function(){
-    return prismaClient.Professor.findMany({
-        distinct: ["courseId"],
-        select: {courseId: true}
-    })
-}
+	return prismaClient.professor.findMany({
+		distinct: ["courseId"],
+		select: {courseId: true}
+	});
+};
 
-const createProfessorRecord = async function(payload: ProfessorRecord){
-    const id = await createUniqueID("Professor");
-    return prismaClient.Professor.create({
-        data: {
-            id,
-            userId: payload.userId,
-            courseId: payload.courseId
-        }
-    })
-}
+const createProfessorRecord = async function(payload: Prisma.ProfessorCreateManyInput){
+	return prismaClient.professor.create({
+		data: payload
+	});
+};
 
-const deleteUniqueProfessor = async function(id: string){
-    return prismaClient.Professor.delete({
-        where: {
-            id
-        }
-    })
-}
-
-const deleteManyProfessors = function(payload: ProfessorRecord){
-    return prismaClient.Professor.deleteMany({
-        where: payload
-    })
-}
+const deleteProfessors = function(payload: PrismaTypes.ProfessorAttributes){
+	return prismaClient.professor.deleteMany({
+		where: payload
+	});
+};
 
 
-export {getAllProfessors, getUniqueProfessor, getFilteredProfessors, getDistinctCourses}
-export {createProfessorRecord}
-export {deleteUniqueProfessor, deleteManyProfessors}
+export {getProfessors, getFilteredProfessors, getDistinctCourses};
+export {createProfessorRecord};
+export {deleteProfessors};

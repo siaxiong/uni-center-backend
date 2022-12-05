@@ -3,4 +3,4 @@ import * as CourseController from "./controller-container/courseController";
 import * as UserController from "./controller-container/userController";
 import * as ProfessorController from "./controller-container/professorController";
 
-export {AuthController, CourseController, UserController, ProfessorController}
+export {AuthController, CourseController, UserController, ProfessorController};

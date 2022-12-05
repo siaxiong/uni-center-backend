@@ -1,5 +1,6 @@
 import { S3Client } from "@aws-sdk/client-s3";
-import {Request} from "express";
+import { Professor, User, Course } from "@prisma/client";
+import { type } from "os";
 
 export namespace AWS_Types {
     export interface Credentials {
@@ -20,6 +21,12 @@ export namespace Auth_Types {
         name: string,
         role: string,
     }
+}
+
+export namespace PrismaTypes {
+    export type ProfessorAttributes = Partial<Professor>;
+    export type UserAttributes = Partial<User>
+    export type CourseAttributes = Partial<Course>
 }
 
 declare global {

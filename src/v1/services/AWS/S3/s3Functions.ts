@@ -1,23 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-    GetObjectCommand,
-    CopyObjectCommand,
-    DeleteObjectCommand,
-    ListObjectsCommand,
-    S3Client,
+	GetObjectCommand,
+	CopyObjectCommand,
+	DeleteObjectCommand,
+	S3Client,
 } from "@aws-sdk/client-s3";
 import {s3Init, s3Client}from "./s3Client";
 import { AWS_Types } from "../../../../myTypes";
 
 
 const s3CopyPDF = async (client : S3Client, email : string, key : string, version : string ) => {
-    const options = {
-        Bucket: "sxbucket22",
-        Key: key,
-        CopySource: "sxbucket22/" + key + "?versionId=" + version,
-    };
-    const cmd = new CopyObjectCommand(options);
-    const response = await client.send(cmd);
-    return response;
+	const options = {
+		Bucket: "sxbucket22",
+		Key: key,
+		CopySource: "sxbucket22/" + key + "?versionId=" + version,
+	};
+	const cmd = new CopyObjectCommand(options);
+	const response = await client.send(cmd);
+	return response;
 };
 
 
@@ -30,14 +30,14 @@ const s3CopyPDF = async (client : S3Client, email : string, key : string, versio
  * @returns The response from the delete command.
  */
 const s3DeleteFile = async (token : AWS_Types.Credentials, fileName : string) => {
-    const s3Client = s3Init(token);
-    const bucketParams = {
-        Bucket: "sxbucket22",
-        Key: fileName,
-    };
-    const cmd = new DeleteObjectCommand(bucketParams);
-    const response = await s3Client.send(cmd);
-    return response;
+	const s3Client = s3Init(token);
+	const bucketParams = {
+		Bucket: "sxbucket22",
+		Key: fileName,
+	};
+	const cmd = new DeleteObjectCommand(bucketParams);
+	const response = await s3Client.send(cmd);
+	return response;
 };
 
 
@@ -47,13 +47,13 @@ const s3DeleteFile = async (token : AWS_Types.Credentials, fileName : string) =>
  * @param stream - The stream to convert to a string.
  */
 const streamToString = (stream:any) =>
-    new Promise((resolve, reject) => {
-        const chunks:any = [];
-        stream.on("data", (chunk:any) => chunks.push(chunk));
-        stream.on("error", reject);
-        // eslint-disable-next-line max-len
-        stream.on("end", () => resolve(Buffer.concat(chunks).toString("base64")));
-    });
+	new Promise((resolve, reject) => {
+		const chunks:any = [];
+		stream.on("data", (chunk:any) => chunks.push(chunk));
+		stream.on("error", reject);
+		// eslint-disable-next-line max-len
+		stream.on("end", () => resolve(Buffer.concat(chunks).toString("base64")));
+	});
 
 
 /**
@@ -62,15 +62,15 @@ const streamToString = (stream:any) =>
  * @param formVersion
  */
 const s3GetBase64File = async (formName : string, formVersion : string) => {
-const bucketParams = {
-        Bucket: "sxbucket22",
-        Key: formName,
-        VersionId: formVersion,
-    };
-    const cmd = new GetObjectCommand(bucketParams);
-    const response = await s3Client.send(cmd);
-    const base64 = await streamToString(response.Body);
-    return base64;
+	const bucketParams = {
+		Bucket: "sxbucket22",
+		Key: formName,
+		VersionId: formVersion,
+	};
+	const cmd = new GetObjectCommand(bucketParams);
+	const response = await s3Client.send(cmd);
+	const base64 = await streamToString(response.Body);
+	return base64;
 };
 
 /**

@@ -1,100 +1,76 @@
 import { ProfessorService, UserService, CourseService } from "../../services/services";
-import { param, validationResult } from "express-validator";
 import { catchError } from "../../utils/catchError";
-
-type ProfessorRecord = {
-    id: string
-    userId: string
-    courseId: string
-}
+import {PrismaTypes} from "../../../myTypes";
+import {Professor, Course, User} from "@prisma/client";
 
 
-const getProfessors = catchError(
-    async function(req, res){
-        const professorRecords = await ProfessorService.getAllProfessors();
+const getCombinedUserProfessorCourseRecord = function(user: User, professor: Professor, course: Course){
+	const combinedRecord : {[key: string]:string} = {};
 
-        const data = await Promise.all(professorRecords.map(async (profRecord: ProfessorRecord) => {
-            let courseRecord = await CourseService.getUniqueCourse(profRecord.courseId);
-            let userRecord = await UserService.getUniqueUser(profRecord.userId);
-            
-            courseRecord.courseId = courseRecord.id;
-            courseRecord.courseName = courseRecord.name;
+	combinedRecord.courseId = course.id;
+	combinedRecord.courseName = course.name;
+	combinedRecord.description = course.description;
 
-            courseRecord.userId = userRecord.id;
-            courseRecord.userName = userRecord.name;
-            courseRecord.userEmail = userRecord.email;
+	combinedRecord.userId = user.id;
+	combinedRecord.userName = user.name;
+	combinedRecord.userEmail = user.email;
 
-            //professorId != userId
-            //professorId is an instance id of a record in the Professor table
-            courseRecord.professorId = profRecord.id;
+	combinedRecord.professorId = professor.id;
 
-            delete courseRecord["id"];
-            delete courseRecord["name"];
+	return combinedRecord;
+};
 
-            console.log(courseRecord);
-            return courseRecord;
-        }))
+export const getProfessors = catchError(
+	async function(req, res){
+		const professorRecords = await ProfessorService.getProfessors();
+		
+		console.log("🚀 ~ file: professorController.ts:14 ~ function ~ professorRecords", professorRecords.length);
+
+		const data = await Promise.all(professorRecords.map(async (profRecord: Professor) => {
+			console.log("🚀 ~ file: professorController.ts:18 ~ data ~ profRecord", profRecord);
+			const courseRecord = (await CourseService.getFilteredCourses({id: profRecord.courseId}))[0];
+			const userRecord = (await UserService.getFilteredUsers({id:profRecord.userId}))[0];
+
+			return getCombinedUserProfessorCourseRecord(userRecord,profRecord,courseRecord);
+		}));
         
-        res.json(data);
-    }
-)
+		res.json(data);
+	}
+);
 
-const getUniqueProfessor = catchError(
-    async function(req, res){
-        const id = req.params.professorId;
+export const getFilteredProfessors = catchError(
+	async function(req, res){
+		const payload: PrismaTypes.ProfessorAttributes  = JSON.parse(req.params.query);
 
-        const profRecord = await ProfessorService.getUniqueProfessor(id);
-        const userRecord = await UserService.getUniqueUser(profRecord.userId);
-        let courseRecord = await CourseService.getUniqueCourse(profRecord.courseId);
+		const profRecord = (await ProfessorService.getFilteredProfessors(payload))[0];
+		console.log("🚀 ~ file: professorController.ts:48 ~ function ~ profRecord", profRecord);
+		const userRecord = (await UserService.getFilteredUsers({id:profRecord.userId}))[0];
+		const courseRecord = (await CourseService.getFilteredCourses({id:profRecord.courseId}))[0];
 
-        courseRecord.courseId = courseRecord.id;
-        courseRecord.courseName = courseRecord.name;
-
-        courseRecord.userId = userRecord.id;
-        courseRecord.userName = userRecord.name;
-        courseRecord.userEmail = userRecord.email;
-
-        //professorId != userId
-        //professorId is an id of a record instance in the Professor table
-        courseRecord.professorId = profRecord.id;
-
-        delete courseRecord["id"];
-        delete courseRecord["name"];
-
-        res.json(courseRecord);
-    }
-)
+		res.json(getCombinedUserProfessorCourseRecord(userRecord,profRecord,courseRecord));
+	}
+);
 
 
-const assignProfToCourse = catchError(
-    async function(req, res){
-        const {userId, courseId} : {userId: string, courseId: string} = req.body;
-        let data:any;
+export const assignProfToCourse = catchError(
+	async function(req, res){
+		const {userId, courseId} : {userId: string, courseId: string} = req.body;
 
-        const userRecord = await UserService.getUniqueUser(userId as string);
-        const courseRecord = await CourseService.getUniqueCourse(courseId as string);
+		await UserService.getFilteredUsers({id:userId});
+		await CourseService.getFilteredCourses({id: courseId});
 
-        data = await ProfessorService.createProfessorRecord({userId, courseId});
+		const data = await ProfessorService.createProfessorRecord({userId, courseId});
 
-        res.json(data);
+		res.json(data);
 
-    }
-)
+	}
+);
 
-const deleteUniqueProfessor = catchError(
-    async function(req, res){
-        const id = req.params.professorId;
-        const data = await ProfessorService.deleteUniqueProfessor(id);
-        res.json(data);
-    }
-)
+export const deleteProfessors = catchError(
+	async function(req, res){
+		const professorId = req.params.professorId;
+		const data = await ProfessorService.deleteProfessors({id: professorId});
+		res.json(data);
+	}
+);
 
-
-//GET
-export {getProfessors, getUniqueProfessor}
-
-//POST
-export {assignProfToCourse}
-
-//DELETE
-export {deleteUniqueProfessor}

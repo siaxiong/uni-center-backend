@@ -1,22 +1,25 @@
 import  {CourseTable} from "../../database/database-functions";
 import { checkEmptyValue } from "../../utils/checkDBResult";
 import prismaClient from "../../database/prismaClient";
+import createUniqueID from "../../database/createUniqueID";
+import { PrismaTypes } from "../../../myTypes";
 
 
-export const getAllCourses = async function(){
-    return checkEmptyValue(CourseTable.getAllCourses());
-}
+export const getCourses = async function(){
+	return checkEmptyValue(CourseTable.getCourses());
+};
 
-export const getUniqueCourse = async function(id: string){
-    return checkEmptyValue(CourseTable.getUniqueCourse(id));
-}
-
+export const getFilteredCourses = async function(payload: PrismaTypes.CourseAttributes){
+	return checkEmptyValue(CourseTable.getFilteredCourses(payload));
+};
 
 export const createCourse = async function(name: string, description: string){
-    return checkEmptyValue(CourseTable.createCourse(name,description));
-}
+	const id = await createUniqueID("Course");
+
+	return checkEmptyValue(CourseTable.createCourse({id,name,description}));
+};
 
 export const deleteUniqueCourse = async function(id: string){
-    const data = await prismaClient.$transaction([prismaClient.Professor.deleteMany({where:{courseId:id}}),prismaClient.Course.delete({where:{id}})]);
-    return checkEmptyValue(data[1]);
-}
+	const data = prismaClient.$transaction([prismaClient.professor.deleteMany({where:{courseId:id}}),prismaClient.course.delete({where:{id}})]);
+	return checkEmptyValue(data);
+};
