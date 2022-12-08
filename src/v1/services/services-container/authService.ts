@@ -2,6 +2,8 @@
 import { UserService } from "../services";
 import * as AWS from "../AWS/Cognito/cognitoFunctions";
 import { User } from "@prisma/client";
+import {AuthenticateJWT} from "../../middlewares/authenticateJWT";
+import {Auth_Types} from "../../../myTypes";
 
 type UserCreateInputs = Omit<User,"id"|"aws_confirmed"|"enrolled">
 
@@ -17,11 +19,11 @@ const register = async function(payload: {userCreateInput: UserCreateInputs, pas
 	}
 };
 
-const login = async function({email,password}:{email:string, password:string}){
-	const credential = await AWS.getCredential(email, password);
-	const db_record = await UserService.getFilteredUsers({email});
-	// await AWS.assignUserToGroup(email,db_record.role);
-	return {credentials: credential,user: db_record[0]};
+const login = async function({email,password}:{email:string, password:string}):Promise<Auth_Types.LoginData>{
+	const tokens = await AWS.signIn(email, password);
+	const payload = await AuthenticateJWT(tokens.idToken as string);
+	const userRecord = await UserService.getFilteredUsers({id:payload["cognito:username"] as string});
+	return {userRecord: userRecord[0], tokens} as Auth_Types.LoginData;
 };
 
 const confirm = async function(email: string, confirmationCode: string){

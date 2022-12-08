@@ -6,7 +6,7 @@ import {NextFunction, Request, Response } from "express";
 import express from "express";
 import cors from "cors";
 import {AuthRouter, CourseRouter, UserRouter, ProfessorRouter} from "./v1/routes/routers";
-import prismaClient from "./v1/database/prismaClient";
+import { AuthenticateJWT, AuthenticateUser } from "./v1/middlewares/authenticateJWT";
 
 const app = express();
 const PORT = 3500;
@@ -34,16 +34,12 @@ const printRequestInfo = (req : Request,resp : Response, next: NextFunction)=>{
 	next();
 };
 
-
-app.use("/api/v1", printRequestInfo, AuthRouter);
-app.use("/api/v1/courses",printRequestInfo, CourseRouter);
-app.use("/api/v1/users", printRequestInfo, UserRouter);
-app.use("/api/v1/professors", printRequestInfo, ProfessorRouter);
+app.use(printRequestInfo);
+app.use("/api/v1", AuthRouter);
+app.use(AuthenticateUser);
+app.use("/api/v1/courses", CourseRouter);
+app.use("/api/v1/users", UserRouter);
+app.use("/api/v1/professors", ProfessorRouter);
 app.listen(PORT, async ()=>{
 	console.log(`******* listening on port ${PORT} ********`);
-	// await prismaClient.professor.delete({
-	// 	where: {
-	// 		id: ""
-	// 	}
-	// });
 });

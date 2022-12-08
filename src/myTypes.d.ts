@@ -12,8 +12,14 @@ export namespace AWS_Types {
 }
 export namespace Auth_Types {
     export interface LoginData {
-        email: string,
-        password: string
+        userRecord: User,
+        tokens: {
+            idToken: string,
+            accessToken: string,
+            refreshToken: string,
+            expiresIn?: number,
+            tokenType?: string
+        }
     }
     export interface RegisterData {
         email: string,

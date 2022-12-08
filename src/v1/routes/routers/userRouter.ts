@@ -5,8 +5,6 @@ import { requestResultValidator } from "../../utils/requestValidator";
 
 const router = express.Router();
 
-
-
 router.get("/", query(["role","aws_confirmed","enrolled"]).optional().exists({checkFalsy:true}),requestResultValidator, UserController.getUsers);
 router.put("/:userId", UserController.updateUser);
 router.get("/:userId", UserController.getUsers);

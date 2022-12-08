@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
-import { AuthService } from "../../services/services";
+import { AuthService, UserService } from "../../services/services";
 import { catchError } from "../../utils/catchError";
 import axios from "axios";
 import URL from "url";
+import {AuthenticateJWT} from "../../middlewares/authenticateJWT";
+import { Prisma, User } from "@prisma/client";
+import { GetOpenIdTokenCommandOutput } from "@aws-sdk/client-cognito-identity";
+import { Auth_Types } from "../../../myTypes";
 
 const register = catchError(
 	async function(req: Request, resp: Response){
@@ -23,39 +27,50 @@ const login = catchError(
 
 const ssoLogin = catchError(
 	async function(req: Request, resp: Response){
-		const {url, code, client_id, redirect_uri} = req.body;
+		const {url, code, client_id, redirect_uri, grant_type} = req.body;
 
 		const data = new URL.URLSearchParams({
 			"code": code,
-			"grant_type": "authorization_code",
+			"grant_type": grant_type,
 			"client_id": client_id,
 			"redirect_uri": redirect_uri,
+			"client_secret": "Ls4wSBNmTNGllJUu17cne26sCOCoL9FphtC0amGdvXtcPOf0QXaSYC6Dlqs_dzkO"
 		});
 
 		const token = await axios({
 			method: "POST",
-			url: `${url}/oauth2/token`,
-
+			// url: `${url}/oauth2/token`,
+			url: `${url}/oauth/token`,
 			headers: {
 				"Content-Type":"application/x-www-form-urlencoded",
+				"Accept": "application/json", 
+				"Accept-Encoding": "identity"
 			},
 			data
 		});
     
 		console.log("****TOKEN START*******");
 		console.log(token.data);
+		const identity = await AuthenticateJWT(token.data.id_token);
+		console.log(identity);
 		console.log("****TOKEN END*******");
 
-		const userInfoToken = await axios({
-			url: `${url}/oauth2/userInfo`,
-			headers: {"Authorization":`Bearer ${token.data.access_token}`}
-		});
+		const userPayload: Prisma.UserCreateManyInput = {
+			id:identity.sub as string,
+			email: identity.email as string,
+			name: identity.name as string,
+			role: null,
+			aws_confirmed: false,
+			enrolled: "PENDING"
+		};
+		// await UserService.deleteUniqueUser(userPayload.id);
+		let userRecord = (await UserService.getFilteredUsers({email: identity.email as string}))[0];
+		console.log("🚀 ~ file: authController.ts:68 ~ function ~ userRecord", userRecord);
+		if(!userRecord) userRecord = await UserService.createUserRecord(userPayload);
 
-		console.log("****USER_INFO_TOKEN START*******");
-		console.log(userInfoToken.data);
-		console.log("****USER_INFO_TOKEN TOKEN END*******");
+		console.log("🚀 ~ file: authController.ts:69 ~ function ~ userRecord", userRecord);
 
-		resp.json(userInfoToken.data);
+		resp.json({userRecord, tokens: {accessToken: token.data.access_token, idToken: token.data.id_token, refreshToken: token.data.refresh_token}});
 
 	}
 );

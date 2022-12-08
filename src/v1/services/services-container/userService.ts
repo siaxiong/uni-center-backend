@@ -6,9 +6,13 @@ import {PrismaTypes} from "../../../myTypes";
 import createUniqueID from "../../database/createUniqueID";
 
 
-export const createUserRecord = async function(userRecordPayload: Prisma.UserCreateInput){
+export const createUserRecord = async function(userRecordPayload: Prisma.UserCreateManyInput, idExist?:string){
 
-	const id = await createUniqueID("User");
+	let id: string;
+
+	if(idExist) id = idExist;
+	else id = await createUniqueID("User"); 
+
 	return checkEmptyValue(UserTable.createUserRecord(Object.assign({id},userRecordPayload)));
 };
 
@@ -26,7 +30,7 @@ export const getUsers = async function(){
 };
 
 export const getFilteredUsers = async function(payload: PrismaTypes.UserAttributes){
-	return checkEmptyValue(UserTable.getFilteredUsers(payload));
+	return UserTable.getFilteredUsers(payload);
 };
 export const updateUser = async function(payload: PrismaTypes.UserAttributes){
 	return checkEmptyValue(UserTable.updateUser(payload));
@@ -38,5 +42,5 @@ export const deleteUniqueUser = async function(id: string ){
 	const data = prismaClient.$transaction([prismaClient.professor.deleteMany({where:{userId:id}}), prismaClient.user.delete({where:{id}})]);
 	console.log("🚀 ~ file: userService.ts ~ line 52 ~ deleteUniqueUser ~ data", data);
 	//i dont need the first object that $transaction returns
-	return checkEmptyValue(data);
+	return data;
 };
