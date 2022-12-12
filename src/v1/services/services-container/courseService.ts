@@ -2,7 +2,7 @@ import  {CourseTable} from "../../database/database-functions";
 import { checkEmptyValue } from "../../utils/checkDBResult";
 import prismaClient from "../../database/prismaClient";
 import createUniqueID from "../../database/createUniqueID";
-import { PrismaTypes } from "../../../myTypes";
+import { PrismaTypes } from "../../../CustomTypes";
 
 
 export const getCourses = async function(){

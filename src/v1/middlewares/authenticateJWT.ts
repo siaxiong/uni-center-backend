@@ -9,7 +9,7 @@ export const AuthenticateJWT = async function(jwt: string){
 
 	const publicKey = await importJWK(jwks2.keys[0], "RS256");
 	const {payload, protectedHeader} = await jwtVerify(jwt, publicKey);
-	console.log("🚀 ~ file: authenticateJWT.ts:10 ~ AuthenticateJWT ~ protectedHeader", protectedHeader);
+	
 	return payload;
 };
 

@@ -1,6 +1,6 @@
 import prismaClient from "../prismaClient";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-import { PrismaTypes } from "../../../myTypes";
+import { PrismaTypes } from "../../../CustomTypes";
 import { Course } from "@prisma/client";
 
 const getCourses = async function(){

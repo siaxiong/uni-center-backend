@@ -2,23 +2,18 @@ import { UserTable} from "../../database/database-functions";
 import { checkEmptyValue } from "../../utils/checkDBResult";
 import prismaClient from "../../database/prismaClient";
 import { Prisma } from "@prisma/client";
-import {PrismaTypes} from "../../../myTypes";
+import {PrismaTypes} from "../../../CustomTypes";
 import createUniqueID from "../../database/createUniqueID";
 
 
-export const createUserRecord = async function(userRecordPayload: Prisma.UserCreateManyInput, idExist?:string){
+export const createUserRecord = async function(userRecordPayload:  Prisma.UserCreateManyInput, id?:string){
 
-	let id: string;
 
-	if(idExist) id = idExist;
-	else id = await createUniqueID("User"); 
+	if(!id) id = await createUniqueID("User"); 
 
-	return checkEmptyValue(UserTable.createUserRecord(Object.assign({id},userRecordPayload)));
+	return UserTable.createUserRecord(Object.assign({id},userRecordPayload));
 };
 
-export const confirmAccount = async function(email: string){
-	return checkEmptyValue(UserTable.confirmAccount(email));
-};
 
 export const isUserExist = async function(email:string){
 	// return checkEmptyValue(UserTable.isUserExist(email));

@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import { S3Client } from "@aws-sdk/client-s3";
 import { Professor, User, Course } from "@prisma/client";
-import { type } from "os";
 
 export namespace AWS_Types {
     export interface Credentials {
@@ -17,8 +17,8 @@ export namespace Auth_Types {
             idToken: string,
             accessToken: string,
             refreshToken: string,
-            expiresIn?: number,
-            tokenType?: string
+            expiresIn: number,
+            tokenType: string
         }
     }
     export interface RegisterData {
@@ -27,6 +27,13 @@ export namespace Auth_Types {
         name: string,
         role: string,
     }
+}
+
+export namespace Registration {
+    export type FormCreateUserInputs = Omit<User,"id"|"enrollmentStatus">;
+    export type IdpCreateUserInputs = Omit<User, "role"|"enrollmentStatus">
+
+
 }
 
 export namespace PrismaTypes {

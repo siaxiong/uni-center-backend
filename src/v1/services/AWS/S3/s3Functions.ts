@@ -6,7 +6,7 @@ import {
 	S3Client,
 } from "@aws-sdk/client-s3";
 import {s3Init, s3Client}from "./s3Client";
-import { AWS_Types } from "../../../../myTypes";
+import { AWS_Types } from "../../../../CustomTypes";
 
 
 const s3CopyPDF = async (client : S3Client, email : string, key : string, version : string ) => {

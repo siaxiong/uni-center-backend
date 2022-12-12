@@ -1,7 +1,7 @@
 import {S3Client} from "@aws-sdk/client-s3";
 import {CognitoIdentityClient} from "@aws-sdk/client-cognito-identity";
 import {fromCognitoIdentityPool} from "@aws-sdk/credential-provider-cognito-identity";
-import { AWS_Types } from "../../../../myTypes";
+import { AWS_Types } from "../../../../CustomTypes";
 
 const REGION = process.env.AWS_REGION;
 const IDENTITY_POOL_ID = process.env.AWS_IDENTITY_POOL_ID;

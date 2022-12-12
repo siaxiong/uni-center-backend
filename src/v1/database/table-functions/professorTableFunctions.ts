@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import prismaClient from "../prismaClient";
-import {PrismaTypes} from "../../../myTypes";
+import {PrismaTypes} from "../../../CustomTypes";
 
 
 const getProfessors = async function(){

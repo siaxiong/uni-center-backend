@@ -1,7 +1,7 @@
 import { catchError } from "../../utils/catchError";
 import { UserService } from "../../services/services";
 import {User} from "@prisma/client";
-import { PrismaTypes } from "../../../myTypes";
+import { PrismaTypes } from "../../../CustomTypes";
 
 type UserAttributes = Partial<User>
 
@@ -11,7 +11,6 @@ export const getUsers = catchError(
 		let data: User[] | [];
 
 		if(payload){
-			if(payload?.aws_confirmed) payload.aws_confirmed = !!payload.aws_confirmed;
 			console.log("🚀 ~ file: userController.ts:14 ~ function ~ payload", payload);
 			data = await UserService.getFilteredUsers(payload as UserAttributes);
 		}else {

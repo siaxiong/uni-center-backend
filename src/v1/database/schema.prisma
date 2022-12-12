@@ -12,8 +12,7 @@ model User {
   name      String
   email     String @unique   
   role      Role? 
-  aws_confirmed   Boolean  @default(false)
-  enrolled  EnrollmentStatus @default(PENDING)
+  enrollmentStatus  EnrollmentStatus @default(Pending)
 
   admin Admin[]
   professor Professor[]
@@ -78,13 +77,13 @@ model Grade {
 }
 
 enum Role {
-  ADMIN
-  PROFESSOR
-  STUDENT
+  Admin
+  Professor
+  Student
 }
 
 enum EnrollmentStatus {
-  ACCEPTED
-  REJECTED
-  PENDING
+  Accepted
+  Rejected
+  Pending
 }

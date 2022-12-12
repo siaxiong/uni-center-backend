@@ -1,6 +1,6 @@
 import { ProfessorService, UserService, CourseService } from "../../services/services";
 import { catchError } from "../../utils/catchError";
-import {PrismaTypes} from "../../../myTypes";
+import {PrismaTypes} from "../../../CustomTypes";
 import {Professor, Course, User} from "@prisma/client";
 
 

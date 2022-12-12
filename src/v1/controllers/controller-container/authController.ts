@@ -5,19 +5,26 @@ import axios from "axios";
 import URL from "url";
 import {AuthenticateJWT} from "../../middlewares/authenticateJWT";
 import { Prisma, User } from "@prisma/client";
-import { GetOpenIdTokenCommandOutput } from "@aws-sdk/client-cognito-identity";
-import { Auth_Types } from "../../../myTypes";
+import { Registration } from "../../../CustomTypes";
 
-const register = catchError(
+export const register = catchError(
 	async function(req: Request, resp: Response){
-		const {email, password, name, role} = req.body;
-		const data = await AuthService.register({userCreateInput: {email, role, name},password});
-		resp.json(data);
+		const {email, password, name, role, sub} = req.body;
+		console.log("🚀 ~ file: authController.ts:13 ~ function ~ name", name);
+		console.log("🚀 ~ file: authController.ts:13 ~ function ~ email", email);
+		console.log("🚀 ~ file: authController.ts:13 ~ function ~ sub", sub);
+
+		let userRecord: User;
+
+		if(sub) userRecord = await AuthService.idpRegistration({id:sub, email, name});
+		else userRecord = await AuthService.formRegistration({userCreateInput: {email, role, name},password});
+		console.log("🚀 ~ file: authController.ts:21 ~ function ~ userRecord", userRecord);
+
+		resp.json(userRecord);
 	}
-); 
+);
 
-
-const login = catchError(
+export const login = catchError(
 	async function(req: Request, resp: Response){
 		const {email, password} = req.body;
 		const data = await AuthService.login({email,password});
@@ -25,7 +32,15 @@ const login = catchError(
 	}
 );
 
-const ssoLogin = catchError(
+export const assignRole = async function(){
+	const extensionURL = "https://university-center.us.webtask.run/adf6e2f2b84784b57522e3b19dfc9201/users";
+	const path = "{user_id}/roles";
+
+	await axios({method:"PATCH", url:extensionURL, headers: {"Authorization":"Bearer #"}});
+
+};
+
+export const getAuthTokens = catchError(
 	async function(req: Request, resp: Response){
 		const {url, code, client_id, redirect_uri, grant_type} = req.body;
 
@@ -34,57 +49,38 @@ const ssoLogin = catchError(
 			"grant_type": grant_type,
 			"client_id": client_id,
 			"redirect_uri": redirect_uri,
-			"client_secret": "Ls4wSBNmTNGllJUu17cne26sCOCoL9FphtC0amGdvXtcPOf0QXaSYC6Dlqs_dzkO"
+			"code_verifier":"TEOMk_xr1AziVpj-eDDWm1pzOqtZWlpvKHcf.UsDM.BCTNnKv-pSImRzI8huqPQWZ4NdNShMDg_Ww6EzcmGWvZMG1su~1OqR3GsjMSjj4.3BorG-ZZ451Xvd~1dqlnk7",
+			// "client_secret": "Ls4wSBNmTNGllJUu17cne26sCOCoL9FphtC0amGdvXtcPOf0QXaSYC6Dlqs_dzkO"
 		});
 
 		const token = await axios({
 			method: "POST",
-			// url: `${url}/oauth2/token`,
 			url: `${url}/oauth/token`,
 			headers: {
 				"Content-Type":"application/x-www-form-urlencoded",
-				"Accept": "application/json", 
-				"Accept-Encoding": "identity"
+				"Accept": "application/json",
+				"Accept-Encoding": "identity" 
 			},
 			data
 		});
     
 		console.log("****TOKEN START*******");
-		console.log(token.data);
-		const identity = await AuthenticateJWT(token.data.id_token);
-		console.log(identity);
+		const identityTokenData = await AuthenticateJWT(token.data.id_token);
+		// console.log("🚀 ~ file: authController.ts:73 ~ function ~ identity", identityTokenData);
+		
+		console.log("🚀 ~ file: authController.ts:57 ~ function ~ token", token.data);
+
+		// const accessData = await AuthenticateJWT(token.data.access_token);
+		
 		console.log("****TOKEN END*******");
 
-		const userPayload: Prisma.UserCreateManyInput = {
-			id:identity.sub as string,
-			email: identity.email as string,
-			name: identity.name as string,
-			role: null,
-			aws_confirmed: false,
-			enrolled: "PENDING"
-		};
-		// await UserService.deleteUniqueUser(userPayload.id);
-		let userRecord = (await UserService.getFilteredUsers({email: identity.email as string}))[0];
-		console.log("🚀 ~ file: authController.ts:68 ~ function ~ userRecord", userRecord);
-		if(!userRecord) userRecord = await UserService.createUserRecord(userPayload);
-
-		console.log("🚀 ~ file: authController.ts:69 ~ function ~ userRecord", userRecord);
-
-		resp.json({userRecord, tokens: {accessToken: token.data.access_token, idToken: token.data.id_token, refreshToken: token.data.refresh_token}});
+		resp.json({identityTokenData, tokens: {accessToken: token.data.access_token, idToken: token.data.id_token, refreshToken: token.data.refresh_token}});
 
 	}
 );
 
 
-const confirm = catchError(
-	async function(req: Request, resp: Response){
-		const {email, confirmationCode} = req.body;
-		const data = await AuthService.confirm(email,confirmationCode);
-		resp.json(data);
-	}
-);
-
-const userExist = catchError(
+export const userExist = catchError(
 	async function(req: Request, resp: Response){
 		const {email} = req.query;
 		const bool = await AuthService.isUserExist(email as string);
@@ -92,4 +88,3 @@ const userExist = catchError(
 	}
 );
 
-export {register, login, ssoLogin, confirm, userExist};

@@ -1,21 +1,10 @@
 import { Prisma} from "@prisma/client";
 import prismaClient from "../prismaClient";
-import {PrismaTypes} from "../../../myTypes";
+import {PrismaTypes} from "../../../CustomTypes";
 
 export const createUserRecord = async function(payload: Prisma.UserCreateManyInput){
 	return prismaClient.user.create({
 		data: payload
-	});
-};
-
-export const confirmAccount = async function(email: string){
-	return prismaClient.user.update({
-		where: {
-			email
-		},
-		data: {
-			aws_confirmed: true
-		}
 	});
 };
 
