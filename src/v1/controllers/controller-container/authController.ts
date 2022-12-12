@@ -1,24 +1,19 @@
 import { Request, Response } from "express";
-import { AuthService, UserService } from "../../services/services";
+import { AuthService } from "../../services/services";
 import { catchError } from "../../utils/catchError";
 import axios from "axios";
 import URL from "url";
 import {AuthenticateJWT} from "../../middlewares/authenticateJWT";
-import { Prisma, User } from "@prisma/client";
-import { Registration } from "../../../CustomTypes";
+import { User } from "@prisma/client";
 
 export const register = catchError(
 	async function(req: Request, resp: Response){
 		const {email, password, name, role, sub} = req.body;
-		console.log("🚀 ~ file: authController.ts:13 ~ function ~ name", name);
-		console.log("🚀 ~ file: authController.ts:13 ~ function ~ email", email);
-		console.log("🚀 ~ file: authController.ts:13 ~ function ~ sub", sub);
 
 		let userRecord: User;
-
+	
 		if(sub) userRecord = await AuthService.idpRegistration({id:sub, email, name});
 		else userRecord = await AuthService.formRegistration({userCreateInput: {email, role, name},password});
-		console.log("🚀 ~ file: authController.ts:21 ~ function ~ userRecord", userRecord);
 
 		resp.json(userRecord);
 	}
@@ -32,14 +27,6 @@ export const login = catchError(
 	}
 );
 
-export const assignRole = async function(){
-	const extensionURL = "https://university-center.us.webtask.run/adf6e2f2b84784b57522e3b19dfc9201/users";
-	const path = "{user_id}/roles";
-
-	await axios({method:"PATCH", url:extensionURL, headers: {"Authorization":"Bearer #"}});
-
-};
-
 export const getAuthTokens = catchError(
 	async function(req: Request, resp: Response){
 		const {url, code, client_id, redirect_uri, grant_type} = req.body;
@@ -50,7 +37,6 @@ export const getAuthTokens = catchError(
 			"client_id": client_id,
 			"redirect_uri": redirect_uri,
 			"code_verifier":"TEOMk_xr1AziVpj-eDDWm1pzOqtZWlpvKHcf.UsDM.BCTNnKv-pSImRzI8huqPQWZ4NdNShMDg_Ww6EzcmGWvZMG1su~1OqR3GsjMSjj4.3BorG-ZZ451Xvd~1dqlnk7",
-			// "client_secret": "Ls4wSBNmTNGllJUu17cne26sCOCoL9FphtC0amGdvXtcPOf0QXaSYC6Dlqs_dzkO"
 		});
 
 		const token = await axios({

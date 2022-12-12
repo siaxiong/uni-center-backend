@@ -37,8 +37,6 @@ const createSingleArray = function(arr: (string| typeof Students)[]){
 	});
 	newArr = newArr.flat();
 
-	console.log("🚀 ~ file: PermissionScopes.ts:37 ~ createSingleArray ~ newArr", newArr);
-	console.log("nice");
 	return newArr;
 };
 

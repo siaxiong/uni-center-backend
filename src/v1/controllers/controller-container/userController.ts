@@ -10,14 +10,8 @@ export const getUsers = catchError(
 		const payload: UserAttributes = req.query; 
 		let data: User[] | [];
 
-		if(payload){
-			console.log("🚀 ~ file: userController.ts:14 ~ function ~ payload", payload);
-			data = await UserService.getFilteredUsers(payload as UserAttributes);
-		}else {
-			console.log("****controller getUsers()*******");
-
-			data = await UserService.getUsers();
-		}
+		if(payload) data = await UserService.getFilteredUsers(payload as UserAttributes);
+		else data = await UserService.getUsers();
 
 		res.json(data);
 	}

@@ -1,20 +1,17 @@
 // import * as UserTable from "../../database/table-functions/userTableFunctions";
 import { UserService } from "../services";
-import * as AWS from "../AWS/Cognito/cognitoFunctions";
-import {AuthenticateJWT} from "../../middlewares/authenticateJWT";
 import {Auth_Types, Registration} from "../../../CustomTypes";
 import { auth0ManagementClient, authenticationClient } from "../Auth0/Auth0";
 import axios from "axios";
 import {Role} from "@prisma/client";
-
+import {ENV_API} from "../../../EnvironmentVariables";
 
 type newUserData = {
 	_id: string,
 	email_verified?: boolean,
 	email: string,
 	name: string,
-  }
-
+}
 
 export const formRegistration = async function(payload: {userCreateInput: Registration.FormCreateUserInputs, password: string}){
 	let userId="";
@@ -79,10 +76,10 @@ export const idpRegistration = async function(payload: Registration.IdpCreateUse
 
 export const login = async function({email,password}:{email:string, password:string}):Promise<Auth_Types.LoginData>{
 	const responseTokens = await authenticationClient.passwordGrant({
-		username:"siaxiongdev1@gmail.com",
-		password:"123password",
+		username:email,
+		password:password,
 		realm: "Username-Password-Authentication",
-		audience: "https://university-center.siaxiong.com",
+		audience: ENV_API.Audience,
 		scope: "offline_access openid"
 	});
 
@@ -93,11 +90,9 @@ export const login = async function({email,password}:{email:string, password:str
 		expiresIn: responseTokens.expires_in,
 		tokenType: responseTokens.token_type,
 	};
-
 	const userRecord = await UserService.getFilteredUsers({email});
 	return {userRecord: userRecord[0], tokens} as Auth_Types.LoginData;
 };
-
 
 export const isUserExist = async function(email: string){
 	return UserService.isUserExist(email);

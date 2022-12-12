@@ -8,7 +8,6 @@ import createUniqueID from "../../database/createUniqueID";
 
 export const createUserRecord = async function(userRecordPayload:  Prisma.UserCreateManyInput, id?:string){
 
-
 	if(!id) id = await createUniqueID("User"); 
 
 	return UserTable.createUserRecord(Object.assign({id},userRecordPayload));

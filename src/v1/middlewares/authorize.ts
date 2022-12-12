@@ -1,8 +1,8 @@
 import {Response, Request, NextFunction} from "express";
-import { AuthenticateJWT } from "./authenticateJWT";
 import { AdminRolePermissions } from "./PermissionScopes";
-
-
+import { jwtVerify, importJWK } from "jose";
+import jwks from "./jwks.json";
+import { ENV_API } from "../../EnvironmentVariables";
 
 export const API_Authorization = async function(req: Request, resp: Response, next: NextFunction){
 	let accessToken = req.header("Authorization");
@@ -10,22 +10,18 @@ export const API_Authorization = async function(req: Request, resp: Response, ne
 	accessToken = accessToken?.substring("Bearer ".length); 
 	if(!accessToken?.length) throw new Error("empty access token!");
 
-
-	const decryptedToken = await AuthenticateJWT(accessToken);
+	//Check if jwtVerify checks expiration date
+	const publicKey = await importJWK(jwks.keys[0], "RS256");
+	const {payload} = await jwtVerify(accessToken, publicKey, {
+		audience: ENV_API.Audience,
+		issuer: ENV_API.Issuer,
+	});
+	console.log("🚀 ~ file: authorize.ts:19 ~ constAPI_Authorization=function ~ payload", payload);
 	
-	const roleInToken = (decryptedToken["https://university-center.siaxiong.com/roles"] as string[])[0];
-	const permissionsInToken = decryptedToken["permissions"] as string[];
-	const audienceInToken = decryptedToken["aud"];
-	const issuerInToken = decryptedToken["iss"];
+	const roleInToken = (payload[ENV_API.RoleClaim] as string[])[0];
+
+	const permissionsInToken = payload["permissions"] as string[];
 	
-	//Check audience
-	if(!audienceInToken?.includes("https://university-center.siaxiong.com")) throw new Error("invalid access token!");
-
-	//Check issuer
-	if(issuerInToken !== "https://university-center.siaxiong.com") throw new Error("invalid access token!");
-
-	//Check access expiration !!!
-
 	//Check for valid role
 	if(!["Admin","Professor","Student"].find(role=>role===roleInToken)) throw new Error("Invalid role in access token!");
 
@@ -33,7 +29,7 @@ export const API_Authorization = async function(req: Request, resp: Response, ne
 	switch(roleInToken){
 	case "Admin": 
 		permissionsInToken.forEach(permission=>{
-			if(!AdminRolePermissions.includes(permission)) throw new Error("Invalid permission(s)");
+			if(!AdminRolePermissions.includes(permission)) throw new Error("Invalid permission(s) in access token!");
 		});
 		break;
 	}
