@@ -26,8 +26,31 @@ const Students = {
 	read: "read:students",
 	create: "create:students",
 	update: "update:students",
-	delete: "delete:students"
+
 };
+
+const AllUseres = [
+	{
+		path: "/users",
+		method: "PUT",
+		body: {
+			role: ["Admin","Professor","Student"],
+			name: "",
+		}
+	},
+];
+
+type NewUserType = [
+	{
+		path: "/users",
+		method: "PUT",
+		body: {
+			role?: "Admin" | "Professor" | "Student",
+			name?: ""
+		}
+	}
+]
+
 
 const createSingleArray = function(arr: (string| typeof Students)[]){
 	let newArr = arr.map(item=>{
@@ -36,7 +59,6 @@ const createSingleArray = function(arr: (string| typeof Students)[]){
 		return temp;
 	});
 	newArr = newArr.flat();
-
 	return newArr;
 };
 

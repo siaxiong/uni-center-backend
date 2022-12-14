@@ -4,35 +4,73 @@ import { jwtVerify, importJWK } from "jose";
 import jwks from "./jwks.json";
 import { ENV_API } from "../../EnvironmentVariables";
 
-export const API_Authorization = async function(req: Request, resp: Response, next: NextFunction){
-	let accessToken = req.header("Authorization");
+export const BasicAuthorization = async function(accessToken: string, actionMsg: string){
+	try {
+		accessToken = accessToken?.substring("Bearer ".length); 
+		if(!accessToken?.length) throw new Error("empty access token!");
 
-	accessToken = accessToken?.substring("Bearer ".length); 
-	if(!accessToken?.length) throw new Error("empty access token!");
-
-	//Check if jwtVerify checks expiration date
-	const publicKey = await importJWK(jwks.keys[0], "RS256");
-	const {payload} = await jwtVerify(accessToken, publicKey, {
-		audience: ENV_API.Audience,
-		issuer: ENV_API.Issuer,
-	});
-	console.log("🚀 ~ file: authorize.ts:19 ~ constAPI_Authorization=function ~ payload", payload);
-	
-	const roleInToken = (payload[ENV_API.RoleClaim] as string[])[0];
-
-	const permissionsInToken = payload["permissions"] as string[];
-	
-	//Check for valid role
-	if(!["Admin","Professor","Student"].find(role=>role===roleInToken)) throw new Error("Invalid role in access token!");
-
-	//Check for valid permissions
-	switch(roleInToken){
-	case "Admin": 
-		permissionsInToken.forEach(permission=>{
-			if(!AdminRolePermissions.includes(permission)) throw new Error("Invalid permission(s) in access token!");
+		//Check if jwtVerify checks expiration date
+		const publicKey = await importJWK(jwks.keys[0], "RS256");
+		await jwtVerify(accessToken, publicKey, {
+			audience: ENV_API.Audience,
+			issuer: ENV_API.Issuer,
 		});
-		break;
+		return true;
+		
+	} catch (error) {
+		console.log(error);	
+		return false;
 	}
+};
 
-	next();
+export const API_Authorization = async function(req: Request, resp: Response, next: NextFunction){
+
+	try {
+		let accessToken = req.header("Authorization");
+
+		const requestPayload = {
+			path: req.path,
+			method: req.method,
+			body: req.body
+		};
+
+		accessToken = accessToken?.substring("Bearer ".length); 
+		if(!accessToken?.length) throw new Error("empty access token!");
+
+		//Check if jwtVerify checks expiration date
+		const publicKey = await importJWK(jwks.keys[0], "RS256");
+		const {payload} = await jwtVerify(accessToken, publicKey, {
+			audience: ENV_API.Audience,
+			issuer: ENV_API.Issuer,
+		});
+	
+		const roleInToken = (payload[ENV_API.RoleClaim] as string[])[0];
+
+		const permissionsInToken = payload["permissions"] as string[];
+	
+		// //Check for valid role
+		// if(!["Admin","Professor","Student"].find(role=>role===roleInToken)) throw new Error("Invalid role in access token!");
+
+		//Check for valid permissions
+		switch(roleInToken){
+		case "Admin": {
+			permissionsInToken.forEach(permission=>{
+				if(!AdminRolePermissions.includes(permission)) throw new Error("Invalid permission(s) in access token!");
+			});
+			break;
+		}
+		}
+
+		console.log("*****");
+		console.log("Access Token  Check Passed!");
+		console.log("*****");
+
+		next();
+		
+	} catch (error) {
+		console.log(error);
+		resp.status(400).send("Invalid access token");
+		
+	}
+	
 };

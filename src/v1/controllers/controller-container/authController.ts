@@ -5,10 +5,12 @@ import axios from "axios";
 import URL from "url";
 import {AuthenticateJWT} from "../../middlewares/authenticateJWT";
 import { User } from "@prisma/client";
+import { body } from "express-validator";
 
 export const register = catchError(
 	async function(req: Request, resp: Response){
 		const {email, password, name, role, sub} = req.body;
+		console.log(body);
 
 		let userRecord: User;
 	
@@ -36,6 +38,8 @@ export const getAuthTokens = catchError(
 			"grant_type": grant_type,
 			"client_id": client_id,
 			"redirect_uri": redirect_uri,
+			// "code_verifier":"OMk_xr1AziVpj-eDDWm1pzOqtZWlpvKHcf.UsDM.BCTNnKv-pSImRzI8huqPQWZ4NdNShMDg_Ww6EzcmGWvZMG1su~1OqR3GsjMSjj4.3BorG-ZZ451Xvd~1dqlnk7",
+
 			"code_verifier":"TEOMk_xr1AziVpj-eDDWm1pzOqtZWlpvKHcf.UsDM.BCTNnKv-pSImRzI8huqPQWZ4NdNShMDg_Ww6EzcmGWvZMG1su~1OqR3GsjMSjj4.3BorG-ZZ451Xvd~1dqlnk7",
 		});
 
@@ -51,8 +55,9 @@ export const getAuthTokens = catchError(
 		});
     
 		console.log("****TOKEN START*******");
-		const identityTokenData = await AuthenticateJWT(token.data.id_token);
-		// console.log("🚀 ~ file: authController.ts:73 ~ function ~ identity", identityTokenData);
+		console.log(token.data);
+		const identityData = await AuthenticateJWT(token.data.id_token);
+		console.log("🚀 ~ file: authController.ts:73 ~ function ~ identity", identityData);
 		
 		console.log("🚀 ~ file: authController.ts:57 ~ function ~ token", token.data);
 
@@ -60,7 +65,7 @@ export const getAuthTokens = catchError(
 		
 		console.log("****TOKEN END*******");
 
-		resp.json({identityTokenData, tokens: {accessToken: token.data.access_token, idToken: token.data.id_token, refreshToken: token.data.refresh_token}});
+		resp.json({identityData, tokens: {accessToken: token.data.access_token, idToken: token.data.id_token, refreshToken: token.data.refresh_token}});
 
 	}
 );

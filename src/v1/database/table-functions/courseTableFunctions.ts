@@ -3,7 +3,7 @@ import prismaClient from "../prismaClient";
 import { PrismaTypes } from "../../../CustomTypes";
 import { Course } from "@prisma/client";
 
-const getCourses = async function(){
+export const getCourses = async function(){
 	return prismaClient.course.findMany({
 		orderBy: [
 			{
@@ -13,19 +13,16 @@ const getCourses = async function(){
 	});
 };
 
-const getFilteredCourses = async function(payload: PrismaTypes.CourseAttributes){
+export const getFilteredCourses = async function(payload: PrismaTypes.CourseAttributes){
 	return prismaClient.course.findMany({
 		where: payload
 	});
 };
 
 
-const createCourse = async function(payload: Course){
+export const createCourse = async function(payload: Course){
 	return prismaClient.course.create({
 		data: payload,
 	});
 };
 
-//DeleteUniqueCourse and DeleteCourse can be combine into one using optional properties in a obj.
-
-export {getCourses, getFilteredCourses, createCourse};

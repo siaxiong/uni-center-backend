@@ -15,30 +15,29 @@ type newUserData = {
 
 export const formRegistration = async function(payload: {userCreateInput: Registration.FormCreateUserInputs, password: string}){
 	let userId="";
+	
 	const roleIDs = {
-		Admin: "rol_8vPTzXQGj5EJ6om4",
-		Professor: "rol_z5yAj8nRZTGFLgCf"
+		Admin: ENV_API.AdminRoleID,
+		Professor: ENV_API.ProfessorRoleID
 	};
 
 	try {
 		console.log(payload);
 		const signUpResponse = await axios({
-			url: "https://university-center.us.auth0.com/dbconnections/signup",
+			url: ENV_API.DB_URL,
 			method: "POST",
 			data: {
-				client_id:"Emr9WsYxl8u9AlANE3lkNDSA9h8KOK6r",
+				client_id: ENV_API.ClientID,
 				email: payload.userCreateInput.email,
 				password: payload.password,
 				name: payload.userCreateInput.name,
-				connection: "Username-Password-Authentication",
+				connection: ENV_API.Connection,
 			}
 		});
 
 		const userData: newUserData = signUpResponse.data;
 		const fetchUser = await auth0ManagementClient.getUsersByEmail(userData.email);
 		userId = fetchUser[0].user_id as string;
-
-		await auth0ManagementClient.assignRolestoUser({id: userId}, {roles:[roleIDs[payload.userCreateInput.role as string as keyof typeof roleIDs]]});
 
 		const createUserPayload = {
 			id: userId,
@@ -78,7 +77,7 @@ export const login = async function({email,password}:{email:string, password:str
 	const responseTokens = await authenticationClient.passwordGrant({
 		username:email,
 		password:password,
-		realm: "Username-Password-Authentication",
+		realm: ENV_API.Connection,
 		audience: ENV_API.Audience,
 		scope: "offline_access openid"
 	});
@@ -94,6 +93,7 @@ export const login = async function({email,password}:{email:string, password:str
 	return {userRecord: userRecord[0], tokens} as Auth_Types.LoginData;
 };
 
+//returns true if user exist false otherwise
 export const isUserExist = async function(email: string){
 	return UserService.isUserExist(email);
 };

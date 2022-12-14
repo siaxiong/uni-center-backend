@@ -8,6 +8,7 @@ type UserAttributes = Partial<User>
 export const getUsers = catchError(
 	async function(req, res){
 		const payload: UserAttributes = req.query; 
+		console.log("🚀 ~ file: userController.ts:11 ~ function ~ payload", payload);
 		let data: User[] | [];
 
 		if(payload) data = await UserService.getFilteredUsers(payload as UserAttributes);
@@ -34,7 +35,6 @@ export const updateUser = catchError(
 		if(payload){
 			payload.id = id;
 			const data = await UserService.updateUser(payload);
-			console.log("🚀 ~ file: userController.ts ~ line 76 ~ data", data);
 			res.json(data);
 		}else{
 			throw new Error("Missing attributes to update!");

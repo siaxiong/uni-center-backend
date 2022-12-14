@@ -24,8 +24,6 @@ export const getProfessors = catchError(
 	async function(req, res){
 		const professorRecords = await ProfessorService.getProfessors();
 		
-		console.log("🚀 ~ file: professorController.ts:14 ~ function ~ professorRecords", professorRecords.length);
-
 		const data = await Promise.all(professorRecords.map(async (profRecord: Professor) => {
 			console.log("🚀 ~ file: professorController.ts:18 ~ data ~ profRecord", profRecord);
 			const courseRecord = (await CourseService.getFilteredCourses({id: profRecord.courseId}))[0];
@@ -41,9 +39,9 @@ export const getProfessors = catchError(
 export const getFilteredProfessors = catchError(
 	async function(req, res){
 		const payload: PrismaTypes.ProfessorAttributes  = JSON.parse(req.params.query);
+		console.log("🚀 ~ file: professorController.ts:42 ~ function ~ payload", JSON.stringify(payload));
 
 		const profRecord = (await ProfessorService.getFilteredProfessors(payload))[0];
-		console.log("🚀 ~ file: professorController.ts:48 ~ function ~ profRecord", profRecord);
 		const userRecord = (await UserService.getFilteredUsers({id:profRecord.userId}))[0];
 		const courseRecord = (await CourseService.getFilteredCourses({id:profRecord.courseId}))[0];
 
