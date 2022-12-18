@@ -1,40 +1,30 @@
 import { CourseService } from "../../services/services";
-import { catchError } from "../../utils/catchError";
-import { checkEmptyValue } from "../../utils/checkDBResult";
+import { Response, Request } from "express";
 
+export const getCourses = async function(req:Request,res:Response){
+	const data = await CourseService.getCourses();
+	res.json(data);
+};
 
-export const getCourses = catchError(
-	async function(req,res){
-		const data = await CourseService.getCourses();
-		res.json(data);
-	}
-);
+export const getFilteredCourses = async function(req: Request, res: Response){
+	const id = req.params.courseId;
 
-export const getFilteredCourses = catchError(
-	async function(req, res){
-		const id = req.params.courseId;
+	const data = await CourseService.getFilteredCourses({id});
+	res.json(data);
+};
 
-		const data = await CourseService.getFilteredCourses({id});
-		res.json(data);
-	}
-);
+export const createCourse = async function (req: Request, res: Response) {
+	const {name, description} = req.body;
 
-export const createCourse = catchError(
-	async function (req, res) {
-		const {name, description} = req.body;
+	const data = await CourseService.createCourse(name, description);
+	res.json(data);
+};
 
-		const data = await CourseService.createCourse(name, description);
-		res.json(data);
-	}
-);
+export const deleteUniqueCourse = async function(req: Request, res: Response) {
+	const id = req.params.courseId;
 
-export const deleteUniqueCourse = catchError(
-	async function(req, res) {
-		const id = req.params.courseId;
-
-		const data = await CourseService.deleteUniqueCourse(id);
-		res.json(data);
-	}
-);
+	const data = await CourseService.deleteUniqueCourse(id);
+	res.json(data);
+};
 
 

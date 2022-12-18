@@ -1,4 +1,4 @@
-import express, {Request, Response, NextFunction} from "express";
+import express from "express";
 import { query } from "express-validator";
 import { UserController } from "../../controllers/controller";
 import { requestResultValidator } from "../../utils/requestValidator";
