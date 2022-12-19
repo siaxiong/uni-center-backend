@@ -2,28 +2,28 @@ import { Prisma, User } from "@prisma/client";
 
 
 const Users = {
-	read: "read:users",
+	get: "get:users",
 	create: "create:users",
 	update: "update:users",
 	delete: "delete:users"
 };
 
 const Courses = {
-	read: "read:courses",
+	get: "get:courses",
 	create: "create:courses",
 	update: "update:courses",
 	delete: "delete:courses"
 };
 
 const Professors = {
-	read: "read:professors",
+	get: "get:professors",
 	create: "create:professors",
 	update: "update:professors",
 	delete: "delete:professors"
 };
 
 const Students = {
-	read: "read:students",
+	get: "get:students",
 	create: "create:students",
 	update: "update:students",
 

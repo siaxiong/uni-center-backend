@@ -1,7 +1,6 @@
 import {Response, Request, NextFunction} from "express";
 import { AdminRolePermissions } from "./PermissionScopes";
 import { jwtVerify, importJWK } from "jose";
-import jwks from "./jwks.json";
 import { ENV_API } from "../../EnvironmentVariables";
 
 export const BasicAuthorization = async function(accessToken: string, actionMsg: string){
@@ -10,9 +9,9 @@ export const BasicAuthorization = async function(accessToken: string, actionMsg:
 		if(!accessToken?.length) throw new Error("empty access token!");
 
 		//Check if jwtVerify checks expiration date
-		const publicKey = await importJWK(jwks.keys[0], "RS256");
+		const publicKey = await importJWK(ENV_API.JWK.keys[0], "RS256");
 		await jwtVerify(accessToken, publicKey, {
-			audience: ENV_API.Audience,
+			audience: ENV_API.UniCenter_API_Audience,
 			issuer: ENV_API.Issuer,
 		});
 		return true;
@@ -38,12 +37,13 @@ export const API_Authorization = async function(req: Request, resp: Response, ne
 		if(!accessToken?.length) throw new Error("empty access token!");
 
 		//Check if jwtVerify checks expiration date
-		const publicKey = await importJWK(jwks.keys[0], "RS256");
+		const publicKey = await importJWK(ENV_API.JWK.keys[0], "RS256");
 		const {payload} = await jwtVerify(accessToken, publicKey, {
-			audience: ENV_API.Audience,
+			audience: ENV_API.UniCenter_API_Audience,
 			issuer: ENV_API.Issuer,
 		});
-	
+
+		console.log(payload);
 		const roleInToken = (payload[ENV_API.RoleClaim] as string[])[0];
 
 		const permissionsInToken = payload["permissions"] as string[];
@@ -68,8 +68,11 @@ export const API_Authorization = async function(req: Request, resp: Response, ne
 		next();
 		
 	} catch (error) {
+		console.log("*****");
 		console.log(error);
-		resp.status(400).send("Invalid access token");
+		console.log("*****");
+
+		resp.status(403).send("Invalid access token");
 		
 	}
 	

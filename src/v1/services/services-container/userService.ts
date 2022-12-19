@@ -1,5 +1,4 @@
 import { UserTable} from "../../database/database-functions";
-import { checkEmptyValue } from "../../utils/checkDBResult";
 import prismaClient from "../../database/prismaClient";
 import { Prisma } from "@prisma/client";
 import {PrismaTypes} from "../../../CustomTypes";

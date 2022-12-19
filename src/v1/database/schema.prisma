@@ -1,5 +1,6 @@
+
 datasource db {
-  url      = "mysql://user1:password@128.199.10.78:3306/uc-db"
+  url      = env("DATABASE_URL")
   provider = "mysql"
 }
 
@@ -26,12 +27,12 @@ model Student {
   user User @relation(fields:[userId], references: [id])
   userId     String  
 
-  courses Course @relation(fields: [courseId], references: [id])
-  courseId String
+  courses Professor @relation(fields: [professorId], references: [id])
+  professorId String
 
   grade Grade[]
 
-  @@unique([courseId, userId])
+  @@unique([professorId, userId])
 }
 
 model Professor {
@@ -41,8 +42,10 @@ model Professor {
   userId String
 
   course Course @relation(fields: [courseId], references: [id])
-
   courseId String 
+
+  assigment Assignment[]
+  student Student[]
 
   @@unique([courseId, userId])
 
@@ -62,15 +65,34 @@ model Course {
   name  String @unique
   description String 
 
-
-  student Student[]
   professor Professor[]
 
 }
 
+//All assignments will be PDF files stored on AWS S3
+model Assignment {
+  id String @id
+  name String @unique
+  points Int
+  description String
+  assigned_date DateTime
+  due_date DateTime
+
+  professor Professor @relation(fields:[professorId], references:[id])
+  professorId String
+
+  grade Grade[]
+}
+
+
 model Grade {
+  //the id assigned to the assignment a student submit back to the professor
   id  String @id
-  grade Int
+  grade Float 
+  fileId String  
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id])
+  assignmentId String
 
   student Student @relation(fields: [studentId], references: [id])
   studentId String

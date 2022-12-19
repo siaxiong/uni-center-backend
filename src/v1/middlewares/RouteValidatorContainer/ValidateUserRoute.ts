@@ -31,7 +31,7 @@ const PUT_METHOD = (req: Request, resp: Response, next: NextFunction)=>{
 			console.log("*****");
 			console.log("USER_PUT_METHOD FAILED!");
 			console.log("*****");
-			resp.status(400).send("invalid token");
+			resp.status(403).send("invalid token");
 		}
 	});
 };

@@ -18,6 +18,7 @@ export const getDistinctCourses = async function(){
 };
 
 type CreateProfessorType = Omit<Professor, "id">;
+
 export const createProfessorRecord = async function(payload: CreateProfessorType){
 	const userRecord = (await UserService.getFilteredUsers({id: payload.userId}))[0];
 	const id = await createUniqueID("Professor");
@@ -29,5 +30,7 @@ export const createProfessorRecord = async function(payload: CreateProfessorType
 export const deleteProfessors = async function(payload: PrismaTypes.ProfessorAttributes){
 	return ProfessorTable.deleteProfessors(payload);
 };
+
+
 
 

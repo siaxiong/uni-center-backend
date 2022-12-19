@@ -24,10 +24,10 @@ export const formRegistration = async function(payload: {userCreateInput: Regist
 	try {
 		console.log(payload);
 		const signUpResponse = await axios({
-			url: ENV_API.DB_URL,
+			url: ENV_API.Auth0_DB_URL,
 			method: "POST",
 			data: {
-				client_id: ENV_API.ClientID,
+				client_id: ENV_API.M2M_ClientID,
 				email: payload.userCreateInput.email,
 				password: payload.password,
 				name: payload.userCreateInput.name,
@@ -78,9 +78,10 @@ export const login = async function({email,password}:{email:string, password:str
 		username:email,
 		password:password,
 		realm: ENV_API.Connection,
-		audience: ENV_API.Audience,
+		audience: ENV_API.UniCenter_API_Audience,
 		scope: "offline_access openid"
 	});
+	console.log("responseTokens: ", responseTokens);
 
 	const tokens = {
 		idToken: responseTokens.id_token,

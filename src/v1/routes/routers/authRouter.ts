@@ -3,8 +3,6 @@ import { body, query } from "express-validator";
 import { requestResultValidator } from "../../utils/requestValidator";
 import { AuthController } from "../../controllers/controller";
 
-
-
 const router = express.Router();
 
 router.post("/register", body(["email", "name", "sub", "password", "role"]), requestResultValidator, AuthController.register);

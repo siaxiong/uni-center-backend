@@ -1,11 +1,10 @@
 import { jwtVerify, importJWK } from "jose";
-import jwks from "./jwks.json";
 import { ENV_API } from "../../EnvironmentVariables";
 
 export const AuthenticateJWT = async function(jwt: string){
 
 	try {
-		const publicKey = await importJWK(jwks.keys[0], "RS256");
+		const publicKey = await importJWK(ENV_API.JWK.keys[0], "RS256");
 		const {payload} = await jwtVerify(jwt, publicKey, {
 			issuer: ENV_API.Issuer,
 		});

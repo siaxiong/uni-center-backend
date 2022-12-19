@@ -8,6 +8,7 @@ import {AuthRouter, CourseRouter, UserRouter, ProfessorRouter} from "./v1/routes
 import { API_Authorization } from "./v1/middlewares/authorize";
 import { ENV_API } from "./EnvironmentVariables";
 import { UserTable } from "./v1/database/database-functions";
+import { UserService } from "./v1/services/services";
 import { AuthenticateJWT } from "./v1/middlewares/authenticateJWT";
 import { rejects } from "assert";
 
@@ -43,9 +44,19 @@ app.use("/api/v1/professors", ProfessorRouter);
 app.listen(PORT, async ()=>{
 	console.log(`******* listening on port ${PORT} ********`);
 
-	// console.log("********ENVIRONMENT VARIABLES CHECK*********");
-	// console.log(ENV_API);
-	// console.log("********************************************");
+	console.log("********ENVIRONMENT VARIABLES CHECK*********");
+	console.log(ENV_API);
+	// const baseCredential = {
+	// 	domain: ENV_API.Domain,
+	// 	client_id: ENV_API.M2M_ClientID,
+	// 	client_secret: ENV_API.M2M_ClientSecret,
+	// };
+
+	// console.log(Object.entries(baseCredential));
+	// console.log(...Object.entries(baseCredential));
+
+	
+	console.log("********************************************");
 
 
 	
