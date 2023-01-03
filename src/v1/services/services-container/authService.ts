@@ -1,5 +1,5 @@
 // import * as UserTable from "../../database/table-functions/userTableFunctions";
-import { UserService } from "../services";
+import { ProfessorService, UserService } from "../services";
 import {Auth_Types, Registration} from "../../../CustomTypes";
 import { auth0ManagementClient, authenticationClient } from "../Auth0/Auth0";
 import axios from "axios";
@@ -15,11 +15,6 @@ type newUserData = {
 
 export const formRegistration = async function(payload: {userCreateInput: Registration.FormCreateUserInputs, password: string}){
 	let userId="";
-	
-	const roleIDs = {
-		Admin: ENV_API.AdminRoleID,
-		Professor: ENV_API.ProfessorRoleID
-	};
 
 	try {
 		console.log(payload);
@@ -59,7 +54,7 @@ export const formRegistration = async function(payload: {userCreateInput: Regist
 //idp = Identity Provider
 export const idpRegistration = async function(payload: Registration.IdpCreateUserInputs){
 	try {
-		const userExist = await UserService.isUserExist(payload.email);
+		const userExist = await UserService.isUserExist({email:payload.email});
 		if(userExist) {
 			const userRecords = await UserService.getFilteredUsers({email: payload.email});
 			return userRecords[0];
@@ -91,12 +86,14 @@ export const login = async function({email,password}:{email:string, password:str
 		tokenType: responseTokens.token_type,
 	};
 	const userRecord = await UserService.getFilteredUsers({email});
-	return {userRecord: userRecord[0], tokens} as Auth_Types.LoginData;
+	const professorCourse = await ProfessorService.getFilteredProfessorCourses({professorId:userRecord[0].id});
+	console.log("professorCourse: ", professorCourse);
+	return {userRecord: userRecord[0], tokens, professorCourse} as Auth_Types.LoginData;
 };
 
 //returns true if user exist false otherwise
 export const isUserExist = async function(email: string){
-	return UserService.isUserExist(email);
+	return UserService.isUserExist({email});
 };
 
 

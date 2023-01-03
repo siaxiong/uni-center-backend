@@ -1,34 +1,59 @@
 import {ProfessorTable} from "../../database/database-functions";
-import { UserService } from "../services";
-import { Professor} from "@prisma/client";
-import { PrismaTypes } from "../../../CustomTypes";
+import {UserService } from "../services";
+import {User,ProfessorCourse ,Course} from "@prisma/client";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-import createUniqueID from "../../database/createUniqueID";
+import {createUniqueID} from "../../database/createUniqueID";
+import prismaClient from "../../database/prismaClient";
 
-export const getProfessors = async function(){
-	return ProfessorTable.getProfessors();
+
+export const getProfessorCourses= async function(payload:{professorId?:string, id?:string}){
+	console.log("8888");
+	if(payload.professorId) return ProfessorTable.getFilteredProfessorCourses({professorId:payload.professorId});
+	else if (payload.id) return ProfessorTable.getFilteredProfessorCourses({id:payload.id});
+	return ProfessorTable.getProfessorCourses();
 };
 
-export const getFilteredProfessors = async function(payload: PrismaTypes.ProfessorAttributes){
-	return ProfessorTable.getFilteredProfessors(payload);
+export const getUniqueProfessorCourse = async function(payload:{id:string}){
+	return ProfessorTable.getUniqueProfessorCourse(payload);
 };
 
-export const getDistinctCourses = async function(){
-	return ProfessorTable.getDistinctCourses();
+export const getFilteredProfessorCourses = async function(payload: Partial<ProfessorCourse>){
+	// return ProfessorTable.getFilteredProfessors(payload);
+	const data = await ProfessorTable.getFilteredProfessorCourses(payload);
+	const filteredData = data.map(record=><{professorCourseId:string, user:User, course:Course}>{
+		professorCourseId:record.id,
+		course: record.course,
+		user: record.user,
+	});
+
+	return filteredData;
 };
 
-type CreateProfessorType = Omit<Professor, "id">;
+export const getDistinctCourse = async function(){
+	return ProfessorTable.getDistinctCourse();
+};
 
-export const createProfessorRecord = async function(payload: CreateProfessorType){
-	const userRecord = (await UserService.getFilteredUsers({id: payload.userId}))[0];
-	const id = await createUniqueID("Professor");
+type CreateProfessorType = Omit<ProfessorCourse, "id">;
+
+export const createProfessorCourse = async function(payload: CreateProfessorType){
+	const userRecord = (await UserService.getFilteredUsers({id: payload.professorId}))[0];
+	const id = await createUniqueID("ProfessorCourse");
 	if(!(userRecord.enrollmentStatus === "Accepted")) throw new Error("User's enrollment is not accepted yet!");
 	
-	return ProfessorTable.createProfessorRecord(Object.assign({id},payload));
+	return ProfessorTable.createProfessorCourse(Object.assign({id},payload));
 };
 
-export const deleteProfessors = async function(payload: PrismaTypes.ProfessorAttributes){
-	return ProfessorTable.deleteProfessors(payload);
+export const deleteProfessorCourse = async function(payload: {id:string}){
+	const professorCourse = await prismaClient.professorCourse.findUniqueOrThrow({where:{id:payload.id}});
+	const deleteAssignments = prismaClient.assignment.deleteMany({where:{professorCourseId:professorCourse.id}});
+	
+	const studentCourses = await prismaClient.studentCourse.findMany({where:{professorCourseId:professorCourse.id}});
+	const deleteStudentCourses = prismaClient.studentCourse.deleteMany({where:{professorCourseId:professorCourse.id}});
+	const deleteAssignmentSubmissions = studentCourses.map(studentCourse=>prismaClient.assignmentSubmission.deleteMany({where:{studentCourseId:studentCourse.id}}));
+
+	return prismaClient.$transaction([...deleteAssignmentSubmissions, deleteStudentCourses, deleteAssignments, prismaClient.professorCourse.deleteMany({where:{id:payload.id}})]);
+
+	// return ProfessorTable.deleteProfessorCourse(payload);
 };
 
 

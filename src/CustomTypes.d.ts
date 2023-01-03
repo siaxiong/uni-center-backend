@@ -19,7 +19,8 @@ export namespace Auth_Types {
             refreshToken: string,
             expiresIn: number,
             tokenType: string
-        }
+        },
+        professorCourse: {professorCourseId:string,course:Course, user:User}[]
     }
     export interface RegisterData {
         email: string,
@@ -36,11 +37,6 @@ export namespace Registration {
 
 }
 
-export namespace PrismaTypes {
-    export type ProfessorAttributes = Partial<Professor>;
-    export type UserAttributes = Partial<User>
-    export type CourseAttributes = Partial<Course>
-}
 
 declare global {
     export namespace Express {

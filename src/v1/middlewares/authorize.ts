@@ -1,5 +1,5 @@
 import {Response, Request, NextFunction} from "express";
-import { AdminRolePermissions } from "./PermissionScopes";
+import { AdminRolePermissions, ProfessorRolePermissions } from "./PermissionScopes";
 import { jwtVerify, importJWK } from "jose";
 import { ENV_API } from "../../EnvironmentVariables";
 
@@ -56,6 +56,12 @@ export const API_Authorization = async function(req: Request, resp: Response, ne
 		case "Admin": {
 			permissionsInToken.forEach(permission=>{
 				if(!AdminRolePermissions.includes(permission)) throw new Error("Invalid permission(s) in access token!");
+			});
+			break;
+		}
+		case "Professor": {
+			permissionsInToken.forEach(permission=>{
+				if(!ProfessorRolePermissions.includes(permission)) throw new Error("invalid permission(s) in access token!");
 			});
 			break;
 		}

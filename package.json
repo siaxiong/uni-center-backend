@@ -6,11 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --poll src/index.ts && npm run prisma",
-    "build": "rimraf ./build && npx prisma generate --schema=./src/v1/database/schema.prisma && tsc",
+    "build": "rimraf ./build && npx prisma generate --schema=./src/v1/database/schema.prisma && tsc ",
     "start": "npm run build && node build/index.js",
     "prisma": "cd src/v1/database && npx prisma init",
-    "prismaMigrateDev": "npx prisma migrate dev --schema=./src/v1/database/schema.prisma --name my-first-migrate",
-    "resetPrismaData": "npx prisma migrate reset --schema=./src/v1/database/schema.prisma",
+    "updateDB": "npx prisma migrate dev --schema=./src/v1/database/schema.prisma --name update migrate",
+    "resetDB": "npx prisma migrate reset --schema=./src/v1/database/schema.prisma",
     "prismaPush": "npx prisma db push --schema=./src/v1/database/schema.prisma"
   },
   "author": "",
@@ -42,6 +42,7 @@
     "@prisma/client": "^4.4.0",
     "@types/jwk-to-pem": "^2.0.1",
     "@types/node": "^18.11.10",
+    "@types/node-fetch": "^2.6.2",
     "@types/pem": "^1.9.6",
     "auth0": "^2.44.0",
     "axios": "^1.2.0",

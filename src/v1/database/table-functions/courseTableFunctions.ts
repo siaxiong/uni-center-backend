@@ -1,6 +1,5 @@
 import prismaClient from "../prismaClient";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-import { PrismaTypes } from "../../../CustomTypes";
 import { Course } from "@prisma/client";
 
 export const getCourses = async function(){
@@ -13,7 +12,13 @@ export const getCourses = async function(){
 	});
 };
 
-export const getFilteredCourses = async function(payload: PrismaTypes.CourseAttributes){
+export const getUniqueCourse = async function(payload:{id:string}){
+	return prismaClient.course.findUnique({
+		where: payload
+	});
+};
+
+export const getFilteredCourses = async function(payload: Partial<Course>){
 	return prismaClient.course.findMany({
 		where: payload
 	});

@@ -9,6 +9,6 @@ router.get("/", CourseController.getCourses);
 router.post("/", body(["name", "description"]).exists({checkFalsy:true}) ,requestResultValidator, CourseController.createCourse);
 
 router.get("/:courseId", CourseController.getFilteredCourses);
-router.delete("/:courseId", CourseController.deleteUniqueCourse);
+router.delete("/:courseId", CourseController.deleteCourse);
 
 export {router as CourseRouter};

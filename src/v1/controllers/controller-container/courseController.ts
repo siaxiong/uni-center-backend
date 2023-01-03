@@ -10,6 +10,7 @@ export const getFilteredCourses = async function(req: Request, res: Response){
 	const id = req.params.courseId;
 
 	const data = await CourseService.getFilteredCourses({id});
+	// console.log("data: ", data);
 	res.json(data);
 };
 
@@ -20,10 +21,10 @@ export const createCourse = async function (req: Request, res: Response) {
 	res.json(data);
 };
 
-export const deleteUniqueCourse = async function(req: Request, res: Response) {
+export const deleteCourse = async function(req: Request, res: Response) {
 	const id = req.params.courseId;
 
-	const data = await CourseService.deleteUniqueCourse(id);
+	const data = await CourseService.deleteCourse(id);
 	res.json(data);
 };
 

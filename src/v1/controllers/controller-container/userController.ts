@@ -1,23 +1,20 @@
 import { UserService } from "../../services/services";
-import {User} from "@prisma/client";
-import { PrismaTypes } from "../../../CustomTypes";
+import {EnrollmentStatus, User} from "@prisma/client";
 import {Request, Response} from "express";
 
-type UserAttributes = Partial<User>
 
 export const getUsers = async function(req:Request, res:Response){
-	const payload: UserAttributes = req.query; 
-	console.log("🚀 ~ file: userController.ts:11 ~ function ~ payload", payload);
+	const payload: Partial<User> = req.query; 
 	let data: User[] | [];
 
-	if(payload) data = await UserService.getFilteredUsers(payload as UserAttributes);
+	if(payload) data = await UserService.getFilteredUsers(payload);
 	else data = await UserService.getUsers();
 
 	res.json(data);
 };
 
 export const getFilteredUsers = async function(req:Request,res:Response){
-	const payload: UserAttributes = req.query;
+	const payload: Partial<User> = req.query; 
 
 	const data = await UserService.getFilteredUsers(payload);
 	res.json(data);
@@ -25,20 +22,16 @@ export const getFilteredUsers = async function(req:Request,res:Response){
 
 export const updateUser = async function(req:Request,res:Response){
 	const id = req.params.userId;
-	const payload: PrismaTypes.UserAttributes = req.body;
+	const payload: {enrollmentStatus:EnrollmentStatus&Partial<Omit<User,"id" | "enrollmentStatus">>} = req.body;
 		
-	if(payload){
-		payload.id = id;
-		const data = await UserService.updateUser(payload);
-		res.json(data);
-	}else{
-		throw new Error("Missing attributes to update!");
-	}
+	const data = await UserService.updateUser({id,...payload});
+	res.json(data);
+
 };
 
-export const deleteUniqueUser = async function(req:Request,res:Response){
+export const deleteUser = async function(req:Request,res:Response){
 	const id = req.params.userId;
 
-	const data = await UserService.deleteUniqueUser(id);
+	const data = await UserService.deleteUser({id});
 	res.json(data);
 };

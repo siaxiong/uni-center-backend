@@ -1,6 +1,5 @@
 import { Prisma, User } from "@prisma/client";
 
-
 const Users = {
 	get: "get:users",
 	create: "create:users",
@@ -22,11 +21,23 @@ const Professors = {
 	delete: "delete:professors"
 };
 
-const Students = {
+const Students:Record<string,string> = {
 	get: "get:students",
 	create: "create:students",
 	update: "update:students",
 
+};
+
+const Assignments = {
+	get: "get:assignments",
+	create: "create:assignments",
+	update: "update:assignments",
+	delete: "delete:assignments"
+};
+
+const Grades = {
+	get: "get:grades",
+	update: "update:grades",
 };
 
 const AllUseres = [
@@ -52,18 +63,20 @@ type NewUserType = [
 ]
 
 
-const createSingleArray = function(arr: (string| typeof Students)[]){
-	let newArr = arr.map(item=>{
-		if(typeof item === typeof "") return item;
-		const temp = Object.values(Object.values(item));
+const createSingleArray = function(arr: Record<string,string>[]){
+	const newArr = arr.map(item=>{
+		// if(typeof item === typeof "") return item;
+		const temp = Object.values(item);
 		return temp;
 	});
-	newArr = newArr.flat();
-	return newArr;
+	const flatArr = newArr.flat();
+	return flatArr;
 };
 
 const AdminRole = [Users, Courses, Professors, Students];
+const ProfessorRole = [Assignments];
 export const AdminRolePermissions = createSingleArray(AdminRole);
+export const ProfessorRolePermissions = createSingleArray(ProfessorRole);
 
 
 

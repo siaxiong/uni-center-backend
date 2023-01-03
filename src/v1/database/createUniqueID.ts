@@ -6,14 +6,17 @@ import prismaClient from "./prismaClient";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
-export default async function(tableName: Prisma.ModelName): Promise<string>{
+
+export const createUniqueID = async function(tableName: Prisma.ModelName): Promise<string>{
 	const id = Math.random().toString(36).substring(2,7).toUpperCase();
 
 	let resp: any = true;
 
 	while(resp){
-		console.log("createUniqueID");
 		switch(tableName){
+
+		//if no user found, null will be returned 
+		//thus exits the  loop
 		case "Admin":
 			resp = await prismaClient.admin.findUnique({
 				where: {
@@ -21,36 +24,43 @@ export default async function(tableName: Prisma.ModelName): Promise<string>{
 				}
 			});
 			break;
-		case "Professor":
-			await prismaClient.professor.findUnique({
+		case "ProfessorCourse":
+			resp = await prismaClient.professorCourse.findUnique({
 				where: {
 					id
 				}
 			});
 			break;
 		case "User":
-			await prismaClient.professor.findUnique({
+			resp = await prismaClient.user.findUnique({
 				where: {
 					id
 				}
 			});
 			break;
-		case "Student":
-			await prismaClient.student.findUnique({
+		case "StudentCourse":
+			resp = await prismaClient.studentCourse.findUnique({
 				where: {
 					id
 				}
 			});
 			break;
 		case "Course":
-			await prismaClient.course.findUnique({
+			resp = await prismaClient.course.findUnique({
 				where: {
 					id
 				}
 			});
 			break;
-		case "Grade":
-			await prismaClient.student.findUnique({
+		case "AssignmentSubmission" :
+			resp = await prismaClient.assignmentSubmission.findUnique({
+				where: {
+					id
+				}
+			});
+			break;
+		case "Assignment":
+			resp = await prismaClient.assignment.findUnique({
 				where: {
 					id
 				}
@@ -59,15 +69,8 @@ export default async function(tableName: Prisma.ModelName): Promise<string>{
 		default:
 			throw new Error("No table name matched");
 		}
-		console.log(resp);
-		if(resp) resp = "";
-
 	}
-
 	
-	//If returned result is empty, that means no record
-	//in that table has the generated id and the id can be use.
-
 	return id;
 
-}
+};

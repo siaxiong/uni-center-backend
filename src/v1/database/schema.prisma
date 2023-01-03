@@ -15,87 +15,98 @@ model User {
   role      Role? 
   enrollmentStatus  EnrollmentStatus @default(Pending)
 
-  admin Admin[]
-  professor Professor[]
-  student Student[]
+  adminPrismaOnly Admin[]
+  professorPrismaOnly ProfessorCourse[]
+  studentPrismaOnly StudentCourse[]
 
   }
 
-model Student {
-  id  String @id
-
-  user User @relation(fields:[userId], references: [id])
-  userId     String  
-
-  courses Professor @relation(fields: [professorId], references: [id])
-  professorId String
-
-  grade Grade[]
-
-  @@unique([professorId, userId])
-}
-
-model Professor {
+//The association between a user, with a role of Student, and a course
+//being taught by a user with a role of Professor.
+model StudentCourse {
   id String @id
 
-  user User @relation(fields: [userId], references: [id])
-  userId String
+  user User @relation(fields:[studentId], references: [id])
+  studentId String  
+
+  professorCourse ProfessorCourse @relation(fields: [professorCourseId], references: [id])
+  professorCourseId String
+
+  submission AssignmentSubmission[]
+
+  @@unique([studentId, professorCourseId])
+
+
+}
+
+//The association between a user, with a role of Professor, and a course
+//they will be teaching.
+model ProfessorCourse {
+  id String @id
+
+  user User @relation(fields: [professorId], references: [id])
+  professorId String
 
   course Course @relation(fields: [courseId], references: [id])
   courseId String 
 
-  assigment Assignment[]
-  student Student[]
+  assignment Assignment[]
+  studentCourse StudentCourse[]
 
-  @@unique([courseId, userId])
+  @@unique([courseId,professorId])
+}
 
+//A course that is available to be taught by a user with a role of Professor.
+//Users, with a role of Student, do NOT take these course directly.
+//They will take the course by associating with an instance of ProfessorCourse.
+model Course {
+  id    String  @id
+  name  String @unique
+  description String 
+
+  professorCourse ProfessorCourse[]
+
+}
+
+//Assignments will be created by users with a role of Professor
+//who must be teaching a course to be able to create assignment
+model Assignment {
+  id String @id
+  pdfId String @unique
+  pdfName String
+  pointsWorth String @default("0")
+  name String @unique
+  description String
+  assigned_date String
+  due_date String
+
+  professorCourse ProfessorCourse @relation(fields:[professorCourseId], references:[id])
+  professorCourseId String
+
+  submission AssignmentSubmission[]
+}
+
+//The assignment a user, with a role of Student, will be assigned
+//when enrolled in course.
+model AssignmentSubmission {
+  id String @id
+  pointsEarned String? @default("0")
+  pdfId String? @unique
+  pdfName String? 
+  
+  assigment Assignment @relation(fields: [assignmentId], references: [id])
+  assignmentId String
+
+  studentCourse StudentCourse @relation(fields: [studentCourseId], references: [id])
+  studentCourseId String
 
 }
 
 model Admin {
   id String @id
 
-  user User @relation(fields: [userId], references: [id])
-  userId String 
-}
-
-model Course {
-
-  id    String  @id
-  name  String @unique
-  description String 
-
-  professor Professor[]
-
-}
-
-//All assignments will be PDF files stored on AWS S3
-model Assignment {
-  id String @id
-  name String @unique
-  points Int
-  description String
-  assigned_date DateTime
-  due_date DateTime
-
-  professor Professor @relation(fields:[professorId], references:[id])
-  professorId String
-
-  grade Grade[]
-}
-
-
-model Grade {
-  //the id assigned to the assignment a student submit back to the professor
-  id  String @id
-  grade Float 
-  fileId String  
-
-  assignment Assignment @relation(fields: [assignmentId], references: [id])
-  assignmentId String
-
-  student Student @relation(fields: [studentId], references: [id])
-  studentId String
+  user User @relation(fields: [adminId], references: [id])
+  adminId String
 }
 
 enum Role {

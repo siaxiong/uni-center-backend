@@ -1,47 +1,39 @@
-import { Prisma} from "@prisma/client";
+import { Prisma, User} from "@prisma/client";
 import prismaClient from "../prismaClient";
-import {PrismaTypes} from "../../../CustomTypes";
 
 export const createUserRecord = async function(payload: Prisma.UserCreateManyInput){
 	return prismaClient.user.create({
 		data: payload
 	});
 };
-
-export const isUserExist = async function(email:string){
+export const isUserExist = async function(payload: {email:string}){
 	const data = await prismaClient.user.findMany({
-		where:{
-			email
-		}
+		where:payload
 	});
 	return data.length ? true : false;
 };
 
 // NEED BOTH getUsers & getFilteredUsers !!!
 export const getUsers = async function(){
-	console.log("****DB getUsers()*******");
 	return prismaClient.user.findMany();
 };
 // NEED BOTH getUsers & getFilteredUsers !!!
 //getFilteredUsers tell you if users with particular 
 //attributes exist while getUsers just return all users
 //regardless of their attributes status
-export const getFilteredUsers = async function(user: PrismaTypes.UserAttributes){
-
+export const getFilteredUsers = async function(payload: Partial<User>){
 	return prismaClient.user.findMany({
-		where: user
+		where: payload
 	});
 };
 
-export const getUniqueUser = async function(id: string){
+export const getUniqueUser = async function(payload: {id:string}){
 	return prismaClient.user.findUnique({
-		where:{
-			id
-		}
+		where:payload
 	});
 };
 
-export const updateUser = async function(payload: PrismaTypes.UserAttributes){
+export const updateUser = async function(payload:{id:string&Partial<Omit<User, "id">>}){
 	return prismaClient.user.update({
 		where: {
 			id: payload.id
